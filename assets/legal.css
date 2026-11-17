@@ -1,0 +1,20 @@
+:root { --bg: #070b14; --line: #1e2a44; --text: #1a2133; --muted: #4a5670; --blue: #1f5eff; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { background: #f4f6fb; color: var(--text); font: 400 16px/1.7 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; }
+a { color: var(--blue); }
+.lg-wrap { max-width: 780px; margin: 0 auto; padding: 0 20px; }
+.lg-top { background: var(--bg); }
+.lg-top .lg-wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+.lg-top img { height: 34px; width: auto; display: block; }
+.lg-top .back { color: #c9d3ea; text-decoration: none; font-size: 14px; }
+.lg-doc { padding-top: 48px; padding-bottom: 64px; }
+.lg-doc h1 { font: 900 clamp(30px, 6vw, 44px)/1.1 Archivo, Inter, system-ui, sans-serif; letter-spacing: -.02em; color: #0a0f1e; }
+.lg-doc .upd { color: var(--muted); font-size: 14px; margin: 8px 0 28px; }
+.lg-doc h2 { font: 800 19px/1.3 Archivo, Inter, system-ui, sans-serif; color: #0a0f1e; margin: 34px 0 10px; }
+.lg-doc p, .lg-doc ul { margin-bottom: 12px; }
+.lg-doc ul { padding-left: 22px; }
+.lg-doc li { margin-bottom: 6px; }
+.lg-doc .key { background: #e9f0ff; border-left: 4px solid var(--blue); padding: 14px 16px; border-radius: 6px; }
+.lg-doc address { font-style: normal; background: #fff; border: 1px solid #e3e8f2; border-radius: 10px; padding: 16px 18px; }
+.lg-foot { border-top: 1px solid #e3e8f2; padding: 24px 0 40px; font-size: 14px; color: var(--muted); }
