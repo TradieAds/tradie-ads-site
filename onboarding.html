@@ -225,7 +225,7 @@
             <div><label class="f" for="a-state">State<span class="req">*</span></label><input id="a-state" name="state" type="text" autocomplete="address-level1" placeholder="e.g. Florida"></div>
             <div class="full"><label class="f" for="a-addr">Business address<span class="req">*</span></label><input id="a-addr" name="address" type="text" autocomplete="street-address" placeholder="Street, city, state, ZIP"></div>
             <div class="full"><label class="f" for="a-title">Your title<span class="req">*</span></label><input id="a-title" name="title" type="text" autocomplete="organization-title" placeholder="e.g. Owner"></div>
-            <div class="full"><label class="f" for="a-area">Your service area<span class="req">*</span></label><textarea id="a-area" name="service_area" placeholder="Cities, counties, ZIP codes, or a radius in miles from your address"></textarea></div>
+            <div class="full"><label class="f" for="a-area">Your service area<span class="req">*</span></label><textarea id="a-area" name="service_area" placeholder="Cities, counties, ZIP codes, or a radius in miles from your address"></textarea><p class="help">The guarantee needs a service area of at least a 15-mile radius. We recommend 15–30 miles.</p></div>
           </div>
           <p class="form-title">Sign</p>
           <label class="f" for="f-sig">Type your full name to sign<span class="req">*</span></label>
@@ -537,7 +537,7 @@ var CONFIG = {
   // Version label saved with each signature. Bump it whenever the agreement text in <template id="agreement-text"> changes.
   agreementVersion: "2026-11-18",
   // Section 5 minimum service-area radius (miles). Blank = the line shows "______".
-  minRadiusMiles: "",
+  minRadiusMiles: "15",
   // One-click Facebook connect link, if you use a tool for it. Blank = button opens the manual steps.
   fbConnectUrl: "",
   // Tradie Ads' Meta Business Manager ID (Business Settings → Business info).
