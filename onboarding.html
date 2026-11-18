@@ -533,7 +533,7 @@
 var CONFIG = {
   // GHL Automation → Workflow → trigger "Inbound Webhook" → copy its URL here.
   // Every step POSTs the client's answers to it (see ghl/onboarding.md).
-  webhookUrl: "",
+  webhookUrl: "https://services.leadconnectorhq.com/hooks/jJvHsMLBbpWBdBy4BZMK/webhook-trigger/9306bf87-6450-410d-a49f-fd91edb8b3c5",
   // Version label saved with each signature. Bump it whenever the agreement text in <template id="agreement-text"> changes.
   agreementVersion: "2026-11-18",
   // Section 5 minimum service-area radius (miles). Blank = the line shows "______".
@@ -582,6 +582,15 @@ var CONFIG = {
     ["name", "email", "phone", "business"].forEach(function (k) { body.set(k, d[k] || ""); });
     var parts = (d.name || "").trim().split(/\s+/);
     body.set("first_name", parts[0] || ""); body.set("last_name", parts.slice(1).join(" "));
+    // Every event carries everything collected so far, so any one of them is enough to rebuild the client's record.
+    var a = state.agreement || {}, g = state.signature;
+    body.set("legal_name", a.legal_name || ""); body.set("entity_type", a.entity_type || ""); body.set("state", a.state || "");
+    body.set("business_address", a.address || ""); body.set("service_area", a.service_area || ""); body.set("signer_title", a.title || "");
+    body.set("signature_name", g ? g.name : ""); body.set("signed_at", g ? g.at : ""); body.set("agreement_version", g ? g.version : "");
+    body.set("min_radius_miles", CONFIG.minRadiusMiles || "");
+    body.set("lead_emails", (d.lead_emails || []).join(", ")); body.set("lead_phones", (d.lead_phones || []).join(", "));
+    body.set("facebook_access_sent", state.gates && state.gates.facebook ? "yes" : "no");
+    body.set("sheet_url", d.sheet || "");
     Object.keys(extra || {}).forEach(function (k) { body.set(k, extra[k]); });
     body.set("page", location.href.split("?")[0]); body.set("submitted_at", new Date().toISOString());
     if (!CONFIG.webhookUrl) { console.warn("[onboarding] webhookUrl not set:", Object.fromEntries(body)); return; }
@@ -656,7 +665,6 @@ var CONFIG = {
     if (bad.length) { bad.forEach(function (i) { i.classList.add("bad"); }); err.textContent = "Please fill in every field with a valid email and phone number."; err.hidden = false; bad[0].focus(); return; }
     err.hidden = true;
     ["name", "email", "phone", "business"].forEach(function (k) { state.data[k] = el[k].value.trim(); });
-    send("onboarding_started");
     advance();
   });
 
@@ -799,9 +807,12 @@ var CONFIG = {
   }
 
   // Step events + navigation
-  var EVENTS = { welcome: "watched_welcome", expect: "watched_expectations", facebook: "facebook_access_sent", final: "watched_final", book: "onboarding_complete" };
+  // Only 3 webhook events per client (agreement_signed, lead_destinations, onboarding_complete) to keep GHL premium-trigger usage low.
   $$("[data-next]").forEach(function (b) {
-    b.addEventListener("click", function () { if (EVENTS[state.step]) send(EVENTS[state.step]); advance(); });
+    b.addEventListener("click", function () {
+      if (state.step === "book" && !state.completeSent) { state.completeSent = true; save(); send("onboarding_complete"); }
+      advance();
+    });
   });
   $("[data-prev]").addEventListener("click", function () { show(STEPS[Math.max(0, STEPS.indexOf(state.step) - 1)]); });
   $("[data-skip]").addEventListener("click", function () { show(STEPS[STEPS.indexOf(state.step) + 1]); });
