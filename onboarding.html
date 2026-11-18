@@ -57,12 +57,37 @@
   @media (min-width: 640px) { .card { padding: 28px; } }
   .card.narrow { max-width: 560px; }
 
-  .video { position: relative; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, #111a2e, #0c1220); }
+  /* Videos sit on the dark stage with a blue glow (no white card) */
+  .video { position: relative; aspect-ratio: 16 / 9; max-width: 720px; margin: 0 auto; border-radius: 14px; overflow: hidden; background: linear-gradient(135deg, #111a2e, #0c1220); border: 1px solid rgba(77,130,255,.45); box-shadow: 0 0 0 1px rgba(31,94,255,.25), 0 0 40px rgba(31,94,255,.45), 0 0 90px rgba(31,94,255,.25); }
   .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
   .video .ph { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px; color: var(--soft); font-size: 14px; text-align: center; padding: 16px; }
   .video .play { width: 64px; height: 64px; border-radius: 50%; background: var(--blue); display: grid; place-items: center; box-shadow: 0 0 0 9px rgba(31,94,255,.2); }
   .video .play svg { width: 24px; height: 24px; margin-left: 3px; fill: #fff; }
-  .video + * { margin-top: 18px; }
+  .video + .card, .video + .cta { margin-top: 32px; }
+
+  /* Custom player: muted autoplay preview, "click for sound" restarts from the top with sound */
+  .vp video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; cursor: pointer; }
+  .vp-sound { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; border: 0; cursor: pointer; background: rgba(7,11,20,.38); color: #fff; font: 800 clamp(16px, 3.4vw, 22px)/1.2 Archivo, Inter, sans-serif; text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+  .vp-sound .play { width: clamp(64px, 12vw, 88px); height: clamp(64px, 12vw, 88px); border-radius: 50%; background: var(--blue); display: grid; place-items: center; box-shadow: 0 0 0 10px rgba(31,94,255,.25), 0 0 40px rgba(31,94,255,.7); animation: vp-pulse 1.8s ease-in-out infinite; }
+  .vp-sound .play svg { width: 40%; height: 40%; margin-left: 6%; fill: #fff; }
+  .vp-sound .vp-label { background: rgba(31,94,255,.92); padding: 8px 16px; border-radius: 99px; text-shadow: none; }
+  @keyframes vp-pulse { 50% { box-shadow: 0 0 0 18px rgba(31,94,255,.12), 0 0 60px rgba(31,94,255,.8); } }
+  .vp.live .vp-sound { display: none; }
+  .vp-resume { position: absolute; left: 50%; top: 50%; width: 72px; height: 72px; margin: -52px 0 0 -36px; border-radius: 50%; background: rgba(31,94,255,.9); display: none; place-items: center; pointer-events: none; }
+  .vp-resume svg { width: 28px; height: 28px; margin-left: 4px; fill: #fff; }
+  .vp.live.paused .vp-resume { display: grid; }
+  .vp-bar { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 10px 8px; background: linear-gradient(transparent, rgba(0,0,0,.75)); color: #fff; }
+  .vp-prog { height: 4px; border-radius: 99px; background: rgba(255,255,255,.25); overflow: hidden; margin: 0 4px 6px; }
+  .vp-prog span { display: block; height: 100%; width: 0; background: var(--blue-hi); }
+  .vp-ctl { display: flex; align-items: center; gap: 4px; }
+  .vp-ctl button { width: 40px; height: 40px; flex: none; border: 0; border-radius: 10px; background: none; color: #fff; display: grid; place-items: center; cursor: pointer; position: relative; }
+  .vp-ctl button:hover { background: rgba(255,255,255,.14); }
+  .vp-ctl svg { width: 22px; height: 22px; }
+  .vp-ctl .ten { position: absolute; font: 700 8px/1 Inter, sans-serif; top: 50%; left: 50%; transform: translate(-50%, -38%); }
+  .vp-time { font: 500 13px/1 Inter, sans-serif; margin-left: 6px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .vp-vol { margin-left: auto; display: flex; align-items: center; }
+  .vp-vol input { width: 90px; accent-color: var(--blue-hi); }
+  @media (max-width: 420px) { .vp-vol input { width: 60px; } .vp-time { font-size: 12px; } }
 
   label.f { display: block; font-weight: 600; font-size: 14px; color: var(--ink); margin: 16px 0 6px; }
   label.f:first-child { margin-top: 0; }
@@ -98,12 +123,12 @@
   .center { text-align: center; }
   .cta { margin-top: 20px; text-align: center; }
   .cta .btn { min-width: 240px; }
-  /* Bare card: no white box, blue glow on the video and button instead */
-  .card.bare { background: none; box-shadow: none; padding: 0; }
-  .card.bare .video { border: 1px solid rgba(77,130,255,.45); box-shadow: 0 0 0 1px rgba(31,94,255,.25), 0 0 40px rgba(31,94,255,.45), 0 0 90px rgba(31,94,255,.25); }
-  .card.bare .cta { margin-top: 28px; }
-  .card.bare .btn-glow { background: var(--blue); color: #fff; box-shadow: 0 0 0 1px rgba(77,130,255,.6), 0 0 28px rgba(31,94,255,.6), 0 0 60px rgba(31,94,255,.3); transition: background .15s, box-shadow .2s; }
-  .card.bare .btn-glow:hover { background: var(--blue-hi); box-shadow: 0 0 0 1px rgba(77,130,255,.8), 0 0 36px rgba(31,94,255,.75), 0 0 80px rgba(31,94,255,.4); }
+  .card + .cta { margin-top: 28px; }
+  /* Blue glowing button for the main "continue" actions on the dark stage */
+  .btn-glow { background: var(--blue); color: #fff; box-shadow: 0 0 0 1px rgba(77,130,255,.6), 0 0 28px rgba(31,94,255,.6), 0 0 60px rgba(31,94,255,.3); transition: background .15s, box-shadow .2s, opacity .15s; }
+  .btn-glow:hover { background: var(--blue-hi); box-shadow: 0 0 0 1px rgba(77,130,255,.8), 0 0 36px rgba(31,94,255,.75), 0 0 80px rgba(31,94,255,.4); }
+  .btn-glow[disabled] { opacity: .4; cursor: not-allowed; box-shadow: none; background: var(--blue); }
+  .cta-note { color: #b9c4dc; font-size: 14px; margin-top: 10px; }
   .fine { font-size: 13px; color: var(--muted); text-align: center; margin-top: 10px; }
 
   .nav { display: flex; justify-content: space-between; max-width: 720px; margin: 14px auto 0; }
@@ -145,7 +170,8 @@
   .form-title { font: 800 18px/1.2 Archivo, sans-serif; color: var(--ink); margin: 22px 0 2px; }
   .scroll-hint { font-size: 13px; color: var(--muted); text-align: center; }
   input.sig { font: 600 24px/1 "Dancing Script", "Snell Roundhand", "Segoe Script", cursive; letter-spacing: .01em; }
-  .signed { background: #ecfdf3; border: 1px solid #bbf7d0; color: #14532d; border-radius: 12px; padding: 14px 16px; margin-top: 16px; font-size: 15px; }
+  .signed { background: #ecfdf3; border: 1px solid #bbf7d0; color: #14532d; border-radius: 12px; padding: 16px 18px; margin-top: 16px; font-size: 15px; }
+  .signed .big { font: 800 20px/1.25 Archivo, Inter, sans-serif; margin-bottom: 4px; }
   .sub { font-size: 18px; color: var(--ink); margin: 24px 0 4px; }
   .cols { display: grid; gap: 12px; grid-template-columns: 1fr; margin-top: 12px; }
   @media (min-width: 620px) { .cols { grid-template-columns: 1fr 1fr; } }
@@ -208,17 +234,15 @@
     <!-- ============ STEP 1 ============ -->
     <section data-step="welcome" hidden>
       <div class="head"><h1>Step 1: Welcome to Tradie Ads</h1><p>Watch this short video first. It explains how onboarding works, then continue.</p></div>
-      <div class="card bare">
-        <div class="video" data-video="welcome"></div>
-        <div class="cta"><button class="btn btn-glow" data-next>Continue to Step 2 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
-      </div>
+      <div class="video" data-video="welcome"></div>
+      <div class="cta"><button class="btn btn-glow" data-next>Continue to Step 2 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     </section>
 
     <!-- ============ STEP 2 ============ -->
     <section data-step="agreement" hidden>
       <div class="head"><h1>Step 2: Sign the agreement</h1><p>Watch the video, then read the agreement below. The guarantee from your call is in it. Fill in the blanks, type your name at the bottom and submit to sign.</p></div>
+      <div class="video" data-video="agreement"></div>
       <div class="card">
-        <div class="video" data-video="agreement"></div>
         <div class="agree-doc" data-agreement-doc tabindex="0" aria-label="Service agreement"></div>
         <p class="scroll-hint">Scroll to read the full agreement.</p>
 
@@ -240,19 +264,19 @@
           <p class="err" data-err hidden></p>
           <div class="actions"><button class="btn btn-primary btn-block" type="submit">Submit signature</button></div>
         </form>
-        <div class="signed" data-signed hidden>✓ Signed by <b data-signed-name></b> on <span data-signed-date></span>. A copy will be emailed to <b data-signed-email></b> for your records.
+        <div class="signed" data-signed hidden>
+          <p class="big">✓ Signed! The contract has been emailed to you directly.</p>
+          <p>Signed by <b data-signed-name></b> on <span data-signed-date></span>. Check <b data-signed-email></b> for your copy (and your spam folder, just in case).</p>
           <div style="margin-top:10px"><button type="button" class="btn btn-ghost" data-print style="min-height:42px">Save a PDF copy</button></div></div>
-
-        <div class="cta"><button class="btn btn-dark" data-next data-needs="agreement" disabled>Continue to Step 3 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
       </div>
+      <div class="cta" data-after-sign hidden><button class="btn btn-glow" data-next>Continue to Step 3 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     </section>
 
     <!-- ============ STEP 3 ============ -->
     <section data-step="expect" hidden>
       <div class="head"><h1>Step 3: What to expect</h1><p>Watch the full video (about 16 minutes) all the way through. The short version is below.</p></div>
+      <div class="video" data-video="expect"></div>
       <div class="card">
-        <div class="video" data-video="expect"></div>
-
         <h3 class="sub">The road map</h3>
         <ul class="list">
           <li><span class="n">1</span><span><b>Days 1–20 · Kickoff.</b> Tracking set up, first ads live, and several angles tested at once to find what makes your customers stop scrolling.</span></li>
@@ -283,16 +307,17 @@
         <div class="note"><b>Billing:</b> $1,000 USD a month, billed monthly with no long-term lock-in. That fee covers management only. Your ad spend is separate, charged to your own ad account, with a minimum of <b>$2,000 USD a month</b> (about $67 a day). The 30-lead guarantee requires that minimum. Full terms are in the agreement you signed in Step 2.</div>
         <div class="note"><b>How to make this work:</b> ask questions (email <a href="mailto:admin@tradie-ads.com">admin@tradie-ads.com</a>), reply quickly when we need footage or approvals, judge results on the trend rather than a single day, and give 24 hours' notice to reschedule a call.</div>
 
-        <div class="cta"><button class="btn btn-dark" data-next>Continue to Step 4 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
       </div>
+      <div class="cta"><button class="btn btn-glow" data-next>Continue to Step 4 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     </section>
 
     <!-- ============ STEP 4 ============ -->
     <section data-step="leads" hidden>
       <div class="head"><h1>Step 4: Tell us where to send leads</h1><p>Watch the video, then confirm where your leads should go.</p></div>
-      <form class="card" data-form="leads" novalidate>
-        <div class="video" data-video="leads"></div>
-        <p style="color:var(--muted);font-size:15px">During the trial, every lead is emailed and texted to you the moment it comes in, and added to your own leads spreadsheet. You'll get its link at the end of onboarding.</p>
+      <form data-form="leads" novalidate>
+      <div class="video" data-video="leads"></div>
+      <div class="card">
+        <p style="color:var(--muted);font-size:15px;margin-top:0">During the trial, every lead is emailed and texted to you the moment it comes in, and added to your own leads spreadsheet. You'll get its link at the end of onboarding.</p>
 
         <label class="f">Email(s) you'd like leads sent to<span class="req">*</span></label>
         <div class="multi" data-multi="lead_emails" data-type="email" data-ph="you@yourbusiness.com"></div>
@@ -305,16 +330,17 @@
         <p class="help" style="margin-top:14px">We don't connect to your CRM during the trial. Want leads sent straight into your CRM? Ask us about it as an add-on.</p>
 
         <p class="err" data-err hidden></p>
-        <div class="cta"><button class="btn btn-dark" type="submit">Save and continue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+      </div>
+      <div class="cta"><button class="btn btn-glow" type="submit">Save and continue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
       </form>
     </section>
 
     <!-- ============ STEP 5 ============ -->
     <section data-step="facebook" hidden>
       <div class="head"><h1>Step 5: Connect your Facebook account</h1><p>Watch the video, then connect your Facebook Page and the ad account that has your credit card on it. Your ad spend is charged to that card.</p></div>
+      <div class="video" data-video="facebook"></div>
       <div class="card">
-        <div class="video" data-video="facebook"></div>
-        <div class="actions">
+        <div class="actions" style="margin-top:0">
           <a class="btn btn-primary btn-block" data-fb-connect href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V5.5h-3c-2.5 0-4 1.6-4 4V11H8v3.5h2V22h3.5v-7.5H16l.5-3.5h-3V9.6c0-.4.2-.6.5-.6z"/></svg>Connect your Facebook account</a>
           <button class="btn btn-warn btn-block" type="button" data-toggle-manual>Not working? Click here</button>
         </div>
@@ -334,17 +360,15 @@
         </div>
 
         <label class="check"><input type="checkbox" data-gate="facebook"> I've connected my account or sent the partner access.</label>
-        <div class="cta"><button class="btn btn-dark" data-next data-needs="facebook" disabled>Continue to Step 6 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
       </div>
+      <div class="cta"><button class="btn btn-glow" data-next data-needs="facebook" disabled>Continue to Step 6 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     </section>
 
     <!-- ============ STEP 6 ============ -->
     <section data-step="final" hidden>
       <div class="head"><h1>Step 6: Final words</h1><p>Watch the video, then book your strategy session. It's the last step.</p></div>
-      <div class="card">
-        <div class="video" data-video="final"></div>
-        <div class="cta"><button class="btn btn-dark" data-next>Book your strategy session <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
-      </div>
+      <div class="video" data-video="final"></div>
+      <div class="cta"><button class="btn btn-glow" data-next>Book your strategy session <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     </section>
 
     <!-- ============ FINISH: book call ============ -->
@@ -352,8 +376,8 @@
       <div class="head"><h1>Book your strategy session</h1><p>30 minutes with Ethan on Google Meet. We'll review the final details, show you the ads we're about to launch, and get your approval to go live.</p></div>
       <div class="card">
         <div class="cal" data-cal></div>
-        <div class="cta"><button class="btn btn-dark" data-next data-finish>I've booked it. Finish <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></button></div>
       </div>
+      <div class="cta"><button class="btn btn-glow" data-next data-finish>I've booked it. Finish <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></button></div>
     </section>
 
     <!-- ============ DONE ============ -->
@@ -550,7 +574,9 @@ var CONFIG = {
   businessId: "160308512414464",
   // GHL calendar for the onboarding call.
   calendarId: "A1TDWQK5Speny62JOZUc",
-  // YouTube/Loom/Vimeo EMBED URLs, e.g. https://www.loom.com/embed/abc123 . Blank = placeholder.
+  // Videos. An .mp4 (e.g. "assets/videos/welcome.mp4") gets the custom player: muted autoplay preview,
+  // "Click here for sound!" restarts it with sound, then only pause, ±10s and volume.
+  // A YouTube/Loom/Vimeo EMBED URL still works as a plain embed. Blank = placeholder.
   videos: {
     welcome:   "https://www.loom.com/embed/820fca7e6d0c4c6390ede6341c7e30ce",
     agreement: "https://www.loom.com/embed/69ea6968ab1b4637a31b609c071deb92",
@@ -607,18 +633,19 @@ var CONFIG = {
   var bars = $("[data-bars]");
   for (var i = 0; i < 8; i++) bars.appendChild(document.createElement("span"));
 
-  function show(step) {
+  // skim = true for the small Previous/Next links, which can move to any step (for reviewing the flow).
+  function show(step, skim) {
     if (STEPS.indexOf(step) < 0) step = "start";
-    if (step !== "start" && !state.data.email) step = "start";
+    if (!skim && step !== "start" && !state.data.email) step = "start";
     state.step = step; save();
     STEPS.forEach(function (s) { $('[data-step="' + s + '"]').hidden = s !== step; });
     var idx = STEPS.indexOf(step);
     $("[data-label]").textContent = LABELS[step];
     $$("span", bars).forEach(function (b, j) { b.className = j < idx ? "done" : j === idx ? "on" : ""; });
     $("[data-prev]").disabled = idx === 0 || step === "done";
-    var skip = $("[data-skip]");
-    // "Next" only revisits steps already completed.
-    skip.disabled = !(state.reached && STEPS.indexOf(state.reached) > idx) || step === "done";
+    // Small "Next" link is always available so anyone can skim every step.
+    $("[data-skip]").disabled = step === "done";
+    playerFor(step);
     $("[data-who]").textContent = state.data.business || "";
     $("[data-sign-biz]").textContent = state.data.business || "my business";
     if (step === "done") {
@@ -646,10 +673,72 @@ var CONFIG = {
     show(next);
   }
 
-  // Videos
+  // Videos. An .mp4 source gets the custom player; a YouTube/Loom/Vimeo embed URL falls back to an iframe.
+  var IC = {
+    play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>',
+    pause: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>',
+    back: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"/><path d="M4 3.5v5h5"/></svg><span class="ten">10</span>',
+    fwd: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.4-5.7L20 8.5"/><path d="M20 3.5v5h-5"/></svg><span class="ten">10</span>',
+    vol: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>',
+    mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z" fill="currentColor"/><path d="m22 9-6 6M16 9l6 6"/></svg>'
+  };
+  function fmt(t) { t = Math.max(0, Math.floor(t || 0)); return Math.floor(t / 60) + ":" + ("0" + t % 60).slice(-2); }
+  function mountPlayer(box, src) {
+    box.classList.add("vp");
+    box.innerHTML = '<video playsinline muted loop preload="none"></video>' +
+      '<span class="vp-resume">' + IC.play + '</span>' +
+      '<button type="button" class="vp-sound"><span class="play">' + IC.play + '</span><span class="vp-label">Click here for sound!</span></button>' +
+      '<div class="vp-bar" hidden><div class="vp-prog"><span></span></div><div class="vp-ctl">' +
+      '<button type="button" data-a="back" aria-label="Back 10 seconds">' + IC.back + '</button>' +
+      '<button type="button" data-a="toggle" aria-label="Play or pause">' + IC.pause + '</button>' +
+      '<button type="button" data-a="fwd" aria-label="Forward 10 seconds">' + IC.fwd + '</button>' +
+      '<span class="vp-time">0:00 / 0:00</span>' +
+      '<span class="vp-vol"><button type="button" data-a="mute" aria-label="Mute or unmute">' + IC.vol + '</button><input type="range" min="0" max="1" step="0.05" value="1" aria-label="Volume"></span>' +
+      '</div></div>';
+    var v = $("video", box), bar = $(".vp-bar", box), prog = $(".vp-prog span", box), time = $(".vp-time", box);
+    var tog = $('[data-a="toggle"]', box), mb = $('[data-a="mute"]', box), range = $(".vp-vol input", box), label = $(".vp-label", box);
+    v.src = src; v.muted = true; v.disablePictureInPicture = true; v.setAttribute("controlslist", "nodownload noplaybackrate");
+    v.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+    function live() { return box.classList.contains("live"); }
+    function volIcon() { mb.innerHTML = v.muted || v.volume === 0 ? IC.mute : IC.vol; }
+    function start() { // restart from the top with sound on
+      box.classList.add("live"); bar.hidden = false;
+      v.loop = false; v.muted = false; v.volume = Number(range.value) || 1; volIcon();
+      try { v.currentTime = 0; } catch (e) {}
+      var p = v.play(); if (p && p.catch) p.catch(function () {});
+    }
+    $(".vp-sound", box).addEventListener("click", start);
+    v.addEventListener("click", function () { if (!live()) start(); else if (v.paused) v.play(); else v.pause(); });
+    tog.addEventListener("click", function () { if (v.paused) v.play(); else v.pause(); });
+    $('[data-a="back"]', box).addEventListener("click", function () { v.currentTime = Math.max(0, v.currentTime - 10); });
+    $('[data-a="fwd"]', box).addEventListener("click", function () { v.currentTime = Math.min(v.duration || 0, v.currentTime + 10); });
+    mb.addEventListener("click", function () { v.muted = !v.muted; if (!v.muted && v.volume === 0) { v.volume = 1; range.value = 1; } volIcon(); });
+    range.addEventListener("input", function () { v.volume = Number(range.value); v.muted = v.volume === 0; volIcon(); });
+    v.addEventListener("play", function () { box.classList.remove("paused"); tog.innerHTML = IC.pause; });
+    v.addEventListener("pause", function () { box.classList.add("paused"); tog.innerHTML = IC.play; });
+    v.addEventListener("timeupdate", function () {
+      if (!live()) return;
+      prog.style.width = (v.duration ? v.currentTime / v.duration * 100 : 0) + "%";
+      time.textContent = fmt(v.currentTime) + " / " + fmt(v.duration);
+    });
+    v.addEventListener("ended", function () { // back to the overlay so they can watch again
+      if (!live()) return;
+      box.classList.remove("live", "paused"); bar.hidden = true; label.textContent = "Watch again";
+    });
+    box._v = v;
+  }
+  // Only the current step's video plays: a muted looping preview until they click for sound.
+  function playerFor(step) {
+    $$(".vp").forEach(function (box) {
+      var v = box._v, here = box.closest("[data-step]").getAttribute("data-step") === step;
+      if (!here) { if (!v.paused) v.pause(); return; }
+      if (!box.classList.contains("live")) { v.muted = true; v.loop = true; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    });
+  }
   $$("[data-video]").forEach(function (v) {
     var src = CONFIG.videos[v.getAttribute("data-video")];
-    if (src && /^https:\/\/(www\.)?(youtube\.com|youtube-nocookie\.com|player\.vimeo\.com|loom\.com|www\.loom\.com)\//.test(src)) {
+    if (src && /\.mp4(\?|#|$)/i.test(src)) mountPlayer(v, src);
+    else if (src && /^https:\/\/(www\.)?(youtube\.com|youtube-nocookie\.com|player\.vimeo\.com|loom\.com|www\.loom\.com)\//.test(src)) {
       v.innerHTML = '<iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Video"></iframe>';
       v.firstChild.src = src;
     } else {
@@ -685,7 +774,7 @@ var CONFIG = {
   var tpl = document.getElementById("agreement-text"), doc = $("[data-agreement-doc]");
   if (tpl && tpl.innerHTML.trim()) doc.innerHTML = tpl.innerHTML;
   else doc.innerHTML = '<p class="empty">The service agreement will appear here.</p>';
-  var fsig = $('[data-form="sign"]'), ab = $('[data-needs="agreement"]');
+  var fsig = $('[data-form="sign"]'), ab = $("[data-after-sign]");
   var AF = ["legal_name", "entity_type", "state", "address", "title", "service_area"];
   state.agreement = state.agreement || {};
   function today() { return new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }); }
@@ -724,13 +813,13 @@ var CONFIG = {
   });
   function showSigned() {
     var g = state.signature; if (!g) return;
-    fsig.hidden = true; $("[data-signed]").hidden = false; ab.disabled = false;
+    fsig.hidden = true; $("[data-signed]").hidden = false; ab.hidden = false;
     $("[data-signed-name]").textContent = g.name;
     $("[data-signed-date]").textContent = new Date(g.at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
     $("[data-signed-email]").textContent = state.data.email || "your email";
     fillDoc();
   }
-  ab.disabled = !state.signature;
+  ab.hidden = !state.signature;
   fsig.addEventListener("submit", function (e) {
     e.preventDefault();
     var name = fsig.elements.signature.value.trim(), err = $("[data-err]", fsig);
@@ -747,6 +836,7 @@ var CONFIG = {
       legal_name: a.legal_name, entity_type: a.entity_type, state: a.state, business_address: a.address, service_area: a.service_area,
       min_radius_miles: CONFIG.minRadiusMiles, user_agent: navigator.userAgent });
     showSigned();
+    $("[data-signed]").scrollIntoView({ behavior: "smooth", block: "center" });
   });
   fillDoc();
   showSigned();
@@ -820,8 +910,8 @@ var CONFIG = {
       advance();
     });
   });
-  $("[data-prev]").addEventListener("click", function () { show(STEPS[Math.max(0, STEPS.indexOf(state.step) - 1)]); });
-  $("[data-skip]").addEventListener("click", function () { show(STEPS[STEPS.indexOf(state.step) + 1]); });
+  $("[data-prev]").addEventListener("click", function () { show(STEPS[Math.max(0, STEPS.indexOf(state.step) - 1)], true); });
+  $("[data-skip]").addEventListener("click", function () { show(STEPS[Math.min(STEPS.length - 1, STEPS.indexOf(state.step) + 1)], true); });
 
   $("[data-done-name]").textContent = state.data.name ? ", " + state.data.name.split(" ")[0] : "";
   var obs = new MutationObserver(function () { $("[data-done-name]").textContent = state.data.name ? ", " + state.data.name.split(" ")[0] : ""; });
