@@ -114,6 +114,25 @@
   .manual { margin-top: 14px; border-top: 1px solid var(--edge); padding-top: 14px; }
   .manual h3 { font-size: 17px; color: var(--ink); }
 
+  .agree-doc { max-height: 440px; overflow: auto; border: 1px solid var(--edge); border-radius: 12px; padding: 18px; background: #fafbfe; font-size: 14px; line-height: 1.6; color: var(--text); margin: 18px 0 4px; }
+  .agree-doc h2 { font-size: 20px; color: var(--ink); margin-bottom: 8px; }
+  .agree-doc h3 { font-size: 15px; color: var(--ink); margin: 16px 0 6px; }
+  .agree-doc p, .agree-doc ul { margin-bottom: 8px; } .agree-doc ul { padding-left: 20px; }
+  .agree-doc .empty { color: var(--muted); text-align: center; padding: 40px 10px; }
+  .agree-doc:focus { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .scroll-hint { font-size: 13px; color: var(--muted); text-align: center; }
+  input.sig { font: 600 22px/1 "Brush Script MT", "Segoe Script", cursive; letter-spacing: .01em; }
+  .signed { background: #ecfdf3; border: 1px solid #bbf7d0; color: #14532d; border-radius: 12px; padding: 14px 16px; margin-top: 16px; font-size: 15px; }
+  .sub { font-size: 18px; color: var(--ink); margin: 24px 0 4px; }
+  .cols { display: grid; gap: 12px; grid-template-columns: 1fr; margin-top: 12px; }
+  @media (min-width: 620px) { .cols { grid-template-columns: 1fr 1fr; } }
+  .col { border: 1px solid var(--edge); border-radius: 12px; padding: 16px; }
+  .col h4 { font: 800 15px/1.2 Archivo, sans-serif; color: var(--ink); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .col ul { list-style: none; display: grid; gap: 7px; font-size: 14px; color: var(--text); }
+  .col li { display: flex; gap: 8px; } .col li::before { flex: none; font-weight: 800; }
+  .col.yes li::before { content: "✓"; color: var(--ok); } .col.no li::before { content: "✕"; color: var(--alert); }
+  .note { background: #f4f7fe; border: 1px solid #dbe5fb; border-radius: 12px; padding: 14px 16px; margin-top: 12px; font-size: 14px; }
+  .note b { color: var(--ink); }
   .days { display: grid; gap: 8px; }
   .cal { border-radius: 12px; overflow: hidden; border: 1px solid var(--edge); }
   .cal iframe { width: 100%; min-height: 720px; border: 0; display: block; }
@@ -141,7 +160,7 @@
     <section data-step="start">
       <div class="head">
         <h1>Welcome to Tradie Ads.</h1>
-        <p>Confirm your details, then walk through a short guided setup. It takes about 15 minutes, and your progress saves on this device.</p>
+        <p>Confirm your details, then walk through a short guided setup. Set aside about 30 minutes somewhere you won't be interrupted. Your progress saves on this device.</p>
       </div>
       <form class="card narrow" data-form="start" novalidate>
         <label class="f" for="f-name">Your name<span class="req">*</span></label>
@@ -165,7 +184,7 @@
 
     <!-- ============ STEP 1 ============ -->
     <section data-step="welcome" hidden>
-      <div class="head"><h1>Step 1: Welcome to Tradie Ads</h1><p>Watch the video below all the way through, then continue.</p></div>
+      <div class="head"><h1>Step 1: Welcome to Tradie Ads</h1><p>Watch this short video first. It explains how onboarding works, then continue.</p></div>
       <div class="card">
         <div class="video" data-video="welcome"></div>
         <div class="cta"><button class="btn btn-dark" data-next>Continue to Step 2 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
@@ -174,28 +193,61 @@
 
     <!-- ============ STEP 2 ============ -->
     <section data-step="agreement" hidden>
-      <div class="head"><h1>Step 2: Sign the agreement</h1><p>Watch the video, then read the agreement all the way through and sign it.</p></div>
+      <div class="head"><h1>Step 2: Sign the agreement</h1><p>Watch the video, then read the agreement below. The guarantee from your call is in it. Type your name at the bottom and submit to sign.</p></div>
       <div class="card">
         <div class="video" data-video="agreement"></div>
-        <div class="actions" data-agreement-link><a class="btn btn-primary btn-block" href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>Open and sign the agreement</a></div>
-        <p class="help center" data-agreement-email>Your agreement has been emailed to you from <b>Ethan | Tradie Ads</b>. Open it, read it all the way through and sign it.</p>
-        <label class="check"><input type="checkbox" data-gate="agreement"> I've read the full agreement and signed it.</label>
+        <div class="agree-doc" data-agreement-doc tabindex="0" aria-label="Service agreement"></div>
+        <p class="scroll-hint">Scroll to read the full agreement.</p>
+
+        <form data-form="sign" novalidate>
+          <label class="f" for="f-sig" style="margin-top:18px">Type your full name to sign<span class="req">*</span></label>
+          <input id="f-sig" name="signature" type="text" class="sig" autocomplete="name" placeholder="Your full name">
+          <label class="check"><input type="checkbox" name="agree"> <span>I've read the full agreement, and typing my name above is my electronic signature on behalf of <b data-sign-biz>my business</b>.</span></label>
+          <p class="err" data-err hidden></p>
+          <div class="actions"><button class="btn btn-primary btn-block" type="submit">Submit signature</button></div>
+        </form>
+        <div class="signed" data-signed hidden>✓ Signed by <b data-signed-name></b> on <span data-signed-date></span>. A copy will be emailed to <b data-signed-email></b> for your records.</div>
+
         <div class="cta"><button class="btn btn-dark" data-next data-needs="agreement" disabled>Continue to Step 3 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
       </div>
     </section>
 
     <!-- ============ STEP 3 ============ -->
     <section data-step="expect" hidden>
-      <div class="head"><h1>Step 3: Your first 30 days</h1><p>Watch the video all the way through, then continue.</p></div>
+      <div class="head"><h1>Step 3: What to expect</h1><p>Watch the full video (about 16 minutes) all the way through. The short version is below.</p></div>
       <div class="card">
         <div class="video" data-video="expect"></div>
+
+        <h3 class="sub">The road map</h3>
         <ul class="list">
-          <li><span class="n">1</span><span><b>Within 24 hours:</b> we build your campaign, including the ads, the offer and the lead form, and send it to you to approve.</span></li>
-          <li><span class="n">2</span><span><b>24 hours after you approve:</b> ads go live, only in your service area.</span></li>
-          <li><span class="n">3</span><span><b>Within 72 hours:</b> leads start landing on your phone and in your inbox.</span></li>
-          <li><span class="n">4</span><span><b>Every week:</b> we check in with your numbers and adjust the ads. Your job is to call every lead fast.</span></li>
-          <li><span class="n">5</span><span><b>By day 30:</b> 30 exclusive leads, or 100% of your money back.</span></li>
+          <li><span class="n">1</span><span><b>Days 1–20 · Kickoff.</b> Tracking set up, first ads live, and several angles tested at once to find what makes your customers stop scrolling.</span></li>
+          <li><span class="n">2</span><span><b>Days 20–40 · Testing.</b> The quiet part. Results can swing day to day: zero leads one day, five to ten the next. That's normal, not a sign anything's broken.</span></li>
+          <li><span class="n">3</span><span><b>Days 40–60 · Stability.</b> Winning ads pull ahead, cost per lead comes down and stays down, and we start talking about scaling.</span></li>
+          <li><span class="n">4</span><span><b>Days 60–90 · Profit.</b> Real revenue traced back to the campaigns.</span></li>
+          <li><span class="n">5</span><span><b>Day 90+ · Autopilot.</b> A lead engine you don't have to think about.</span></li>
         </ul>
+        <p class="help">Every business is different and some move faster. Think of this as a map.</p>
+
+        <div class="cols">
+          <div class="col yes"><h4>Included every month</h4><ul>
+            <li>Campaign setup in your Meta Ads Manager</li>
+            <li>Ad creative and copy (if we need footage, we'll tell you exactly what to film)</li>
+            <li>Audience research and targeting</li>
+            <li>Pixel setup and retargeting</li>
+            <li>Daily campaign optimization</li>
+            <li>Monthly performance report and review call</li>
+          </ul></div>
+          <div class="col no"><h4>Not included</h4><ul>
+            <li>Landing pages and funnels (we use Facebook lead forms). Available as an add-on.</li>
+            <li>Google and YouTube ads. Available as an add-on.</li>
+            <li>Calling and closing your leads. We can help you hire someone.</li>
+            <li>Posting organic content to your social media. Not offered.</li>
+          </ul></div>
+        </div>
+
+        <div class="note"><b>Billing:</b> monthly, with no long-term lock-in. Our fee covers management only. Your ad spend is separate and is charged to your own ad account. For month one we recommend <b>$1,000–1,500</b> in ad spend while we test.</div>
+        <div class="note"><b>How to make this work:</b> ask questions (email <a href="mailto:admin@tradie-ads.com">admin@tradie-ads.com</a>), reply quickly when we need footage or approvals, judge results on the trend rather than a single day, and give 24 hours' notice to reschedule a call.</div>
+
         <div class="cta"><button class="btn btn-dark" data-next>Continue to Step 4 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
       </div>
     </section>
@@ -205,7 +257,7 @@
       <div class="head"><h1>Step 4: Tell us where to send leads</h1><p>Watch the video, then confirm where your leads should go.</p></div>
       <form class="card" data-form="leads" novalidate>
         <div class="video" data-video="leads"></div>
-        <p style="color:var(--muted);font-size:15px">Every lead is emailed and texted to you the moment it comes in, and added to your shared spreadsheet.</p>
+        <p style="color:var(--muted);font-size:15px">During the trial, every lead is emailed and texted to you the moment it comes in, and added to your own leads spreadsheet. You'll get its link at the end of onboarding.</p>
 
         <label class="f">Email(s) you'd like leads sent to<span class="req">*</span></label>
         <div class="multi" data-multi="lead_emails" data-type="email" data-ph="you@yourbusiness.com"></div>
@@ -215,9 +267,7 @@
         <div class="multi" data-multi="lead_phones" data-type="tel" data-ph="+1 (555) 000-0000"></div>
         <button type="button" class="add" data-add="lead_phones">+ Add another number</button>
 
-        <label class="f" for="f-sheet">Google account for the shared spreadsheet</label>
-        <input id="f-sheet" name="sheet_email" type="email" placeholder="you@gmail.com">
-        <p class="help">Optional. We'll share the lead spreadsheet with this account. Leave it blank to use your first lead email.</p>
+        <p class="help" style="margin-top:14px">We don't connect to your CRM during the trial. Want leads sent straight into your CRM? Ask us about it as an add-on.</p>
 
         <p class="err" data-err hidden></p>
         <div class="cta"><button class="btn btn-dark" type="submit">Save and continue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
@@ -226,7 +276,7 @@
 
     <!-- ============ STEP 5 ============ -->
     <section data-step="facebook" hidden>
-      <div class="head"><h1>Step 5: Connect your Facebook account</h1><p>Watch the video, then give us access to your Facebook Page and ad account. Your ads run under your business name.</p></div>
+      <div class="head"><h1>Step 5: Connect your Facebook account</h1><p>Watch the video, then connect your Facebook Page and the ad account that has your credit card on it. Your ad spend is charged to that card.</p></div>
       <div class="card">
         <div class="video" data-video="facebook"></div>
         <div class="actions">
@@ -244,7 +294,8 @@
             <li><span class="n">4</span><span>Under <b>Pages</b>, select your business Page and turn on <b>Full control</b> (needed to run ads and access leads).</span></li>
             <li><span class="n">5</span><span>Under <b>Ad accounts</b>, select your ad account and turn on <b>Manage ad account</b>. Then click <b>Save</b>.</span></li>
           </ol>
-          <p class="help">No Business Manager or ad account yet? Tick the box below anyway and we'll set it up with you on the onboarding call.</p>
+          <p class="help"><b>Ad account disabled, or Page deleted?</b> It happens. Tick the box below and email <a href="mailto:admin@tradie-ads.com">admin@tradie-ads.com</a> with what you see. We'll walk you through setting up a new one before launch.</p>
+          <p class="help">No Business Manager or ad account yet? Same thing: tick the box and we'll set it up with you on your strategy session.</p>
         </div>
 
         <label class="check"><input type="checkbox" data-gate="facebook"> I've connected my account or sent the partner access.</label>
@@ -254,19 +305,19 @@
 
     <!-- ============ STEP 6 ============ -->
     <section data-step="final" hidden>
-      <div class="head"><h1>Step 6: Final words</h1><p>Watch the video all the way through, then book your onboarding call.</p></div>
+      <div class="head"><h1>Step 6: Final words</h1><p>Watch the video, then book your strategy session. It's the last step.</p></div>
       <div class="card">
         <div class="video" data-video="final"></div>
-        <div class="cta"><button class="btn btn-dark" data-next>Book your onboarding call <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+        <div class="cta"><button class="btn btn-dark" data-next>Book your strategy session <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
       </div>
     </section>
 
     <!-- ============ FINISH: book call ============ -->
     <section data-step="book" hidden>
-      <div class="head"><h1>Book your onboarding call</h1><p>30 minutes with Ethan: your campaign plan, how leads will reach you, and what to expect in your first 30 days.</p></div>
+      <div class="head"><h1>Book your strategy session</h1><p>30 minutes with Ethan on Google Meet. We'll review the final details, show you the ads we're about to launch, and get your approval to go live.</p></div>
       <div class="card">
         <div class="cal" data-cal></div>
-        <div class="cta"><button class="btn btn-dark" data-next data-finish>I've booked my call. Finish <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></button></div>
+        <div class="cta"><button class="btn btn-dark" data-next data-finish>I've booked it. Finish <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></button></div>
       </div>
     </section>
 
@@ -275,7 +326,12 @@
       <div class="card narrow center">
         <div class="done-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
         <h2 style="font-size:28px;color:var(--ink)">You're all set<span data-done-name></span>!</h2>
-        <p style="color:var(--muted);margin-top:10px">We're building your campaign now. You'll hear from Ethan within 24 hours with your ads to approve.</p>
+        <p style="color:var(--muted);margin-top:10px">We're building your campaign now. On your strategy session we'll show you the ads and get your approval to go live.</p>
+        <div data-sheet-wrap style="margin-top:18px">
+          <a class="btn btn-primary btn-block" data-sheet href="#" target="_blank" rel="noopener">Open your leads spreadsheet</a>
+          <p class="help">Bookmark it. Every lead shows up here as it comes in, as well as by email and text.</p>
+        </div>
+        <p class="help" data-sheet-later>We'll email you the link to your leads spreadsheet before launch. Every lead shows up there as it comes in, as well as by email and text.</p>
         <p style="color:var(--muted);margin-top:10px">Questions? Text <b>(650) 719-7145</b> or email <a href="mailto:admin@tradie-ads.com">admin@tradie-ads.com</a>.</p>
       </div>
     </section>
@@ -283,6 +339,11 @@
     <div class="nav" data-nav><button type="button" data-prev>← Previous</button><button type="button" data-skip>Next →</button></div>
   </div>
 </main>
+
+<!-- ===== AGREEMENT TEXT =====
+     Paste the full service agreement as HTML inside this template (<h2>, <h3>, <p>, <ul>).
+     Then bump CONFIG.agreementVersion (e.g. "2026-11-v1") so every signature records which version was signed. -->
+<template id="agreement-text"></template>
 
 <footer class="foot">
   <img src="assets/logo-white.png" alt="Tradie Ads">
@@ -296,8 +357,8 @@ var CONFIG = {
   // GHL Automation → Workflow → trigger "Inbound Webhook" → copy its URL here.
   // Every step POSTs the client's answers to it (see ghl/onboarding.md).
   webhookUrl: "",
-  // Link to the e-sign agreement (e.g. a GHL Documents & Contracts link). Blank = "check your email" text.
-  agreementUrl: "",
+  // Version label saved with each signature. Bump it whenever the agreement text in <template id="agreement-text"> changes.
+  agreementVersion: "draft",
   // One-click Facebook connect link, if you use a tool for it. Blank = button opens the manual steps.
   fbConnectUrl: "",
   // Tradie Ads' Meta Business Manager ID (Business Settings → Business info).
@@ -326,6 +387,8 @@ var CONFIG = {
   var q = new URLSearchParams(location.search);
   ["name", "email", "phone", "business"].forEach(function (k) { if (q.get(k) && !state.data[k]) state.data[k] = q.get(k); });
   if (q.get("business")) $("[data-biz-help]").hidden = false;
+  // Per-client leads spreadsheet: ?sheet=https://docs.google.com/spreadsheets/...
+  if (/^https:\/\/docs\.google\.com\//.test(q.get("sheet") || "")) state.data.sheet = q.get("sheet");
 
   function send(event, extra) {
     var d = state.data, body = new URLSearchParams();
@@ -356,6 +419,12 @@ var CONFIG = {
     // "Next" only revisits steps already completed.
     skip.disabled = !(state.reached && STEPS.indexOf(state.reached) > idx) || step === "done";
     $("[data-who]").textContent = state.data.business || "";
+    $("[data-sign-biz]").textContent = state.data.business || "my business";
+    if (step === "done") {
+      var has = !!state.data.sheet;
+      $("[data-sheet-wrap]").hidden = !has; $("[data-sheet-later]").hidden = has;
+      if (has) $("[data-sheet]").href = state.data.sheet;
+    }
     if (step === "book") mountCalendar();
     if (step === "leads") {
       // Seed empty first rows with the details from the Start step.
@@ -407,9 +476,32 @@ var CONFIG = {
     cb.addEventListener("change", function () { state.gates[g] = cb.checked; btn.disabled = !cb.checked; save(); });
   });
 
-  // Agreement link
-  if (CONFIG.agreementUrl) { $("[data-agreement-link] a").href = CONFIG.agreementUrl; $("[data-agreement-email]").hidden = true; }
-  else $("[data-agreement-link]").hidden = true;
+  // Agreement: text comes from <template id="agreement-text">
+  var tpl = document.getElementById("agreement-text"), doc = $("[data-agreement-doc]");
+  if (tpl && tpl.innerHTML.trim()) doc.innerHTML = tpl.innerHTML;
+  else doc.innerHTML = '<p class="empty">The service agreement will appear here.</p>';
+  var fsig = $('[data-form="sign"]'), ab = $('[data-needs="agreement"]');
+  function showSigned() {
+    var g = state.signature; if (!g) return;
+    fsig.hidden = true; $("[data-signed]").hidden = false; ab.disabled = false;
+    $("[data-signed-name]").textContent = g.name;
+    $("[data-signed-date]").textContent = new Date(g.at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+    $("[data-signed-email]").textContent = state.data.email || "your email";
+  }
+  ab.disabled = !state.signature;
+  fsig.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var name = fsig.elements.signature.value.trim(), err = $("[data-err]", fsig);
+    fsig.elements.signature.classList.remove("bad");
+    if (name.split(/\s+/).length < 2) { fsig.elements.signature.classList.add("bad"); err.textContent = "Type your full name (first and last) to sign."; err.hidden = false; return; }
+    if (!fsig.elements.agree.checked) { err.textContent = "Tick the box to confirm you've read the agreement."; err.hidden = false; return; }
+    err.hidden = true;
+    state.signature = { name: name, at: new Date().toISOString(), version: CONFIG.agreementVersion };
+    save();
+    send("agreement_signed", { signature_name: name, signed_at: state.signature.at, agreement_version: CONFIG.agreementVersion, user_agent: navigator.userAgent });
+    showSigned();
+  });
+  showSigned();
 
   // Facebook
   var fb = $("[data-fb-connect]"), manual = $("[data-manual]");
@@ -441,7 +533,6 @@ var CONFIG = {
   });
   $$("[data-add]").forEach(function (b) { b.addEventListener("click", function () { addRow($('[data-multi="' + b.getAttribute("data-add") + '"]')).focus(); }); });
   var fl = $('[data-form="leads"]');
-  if (state.data.sheet_email) fl.elements.sheet_email.value = state.data.sheet_email;
   fl.addEventListener("submit", function (e) {
     e.preventDefault();
     var err = $("[data-err]", fl), bad = [];
@@ -456,8 +547,7 @@ var CONFIG = {
     if (bad.length) { bad.forEach(function (i) { i.classList.add("bad"); }); err.textContent = "Add at least one valid email and one valid mobile number."; err.hidden = false; return; }
     err.hidden = true;
     state.data.lead_emails = ev; state.data.lead_phones = pv;
-    state.data.sheet_email = fl.elements.sheet_email.value.trim();
-    send("lead_destinations", { lead_emails: ev.join(", "), lead_phones: pv.join(", "), sheet_email: state.data.sheet_email || ev[0] });
+    send("lead_destinations", { lead_emails: ev.join(", "), lead_phones: pv.join(", ") });
     advance();
   });
 
@@ -469,13 +559,13 @@ var CONFIG = {
     var p = new URLSearchParams({ first_name: parts[0] || "", last_name: parts.slice(1).join(" "), email: d.email || "", phone: d.phone || "" });
     var f = document.createElement("iframe");
     f.src = "https://api.leadconnectorhq.com/widget/booking/" + CONFIG.calendarId + "?" + p.toString();
-    f.title = "Book your onboarding call"; f.scrolling = "no"; f.id = CONFIG.calendarId + "_onb";
+    f.title = "Book your strategy session"; f.scrolling = "no"; f.id = CONFIG.calendarId + "_onb";
     $("[data-cal]").appendChild(f);
     var s = document.createElement("script"); s.src = "https://link.msgsndr.com/js/form_embed.js"; s.async = true; document.body.appendChild(s);
   }
 
   // Step events + navigation
-  var EVENTS = { welcome: "watched_welcome", agreement: "agreement_signed", expect: "watched_expectations", facebook: "facebook_access_sent", final: "watched_final", book: "onboarding_complete" };
+  var EVENTS = { welcome: "watched_welcome", expect: "watched_expectations", facebook: "facebook_access_sent", final: "watched_final", book: "onboarding_complete" };
   $$("[data-next]").forEach(function (b) {
     b.addEventListener("click", function () { if (EVENTS[state.step]) send(EVENTS[state.step]); advance(); });
   });
