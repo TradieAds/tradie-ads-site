@@ -98,6 +98,12 @@
   .center { text-align: center; }
   .cta { margin-top: 20px; text-align: center; }
   .cta .btn { min-width: 240px; }
+  /* Bare card: no white box, blue glow on the video and button instead */
+  .card.bare { background: none; box-shadow: none; padding: 0; }
+  .card.bare .video { border: 1px solid rgba(77,130,255,.45); box-shadow: 0 0 0 1px rgba(31,94,255,.25), 0 0 40px rgba(31,94,255,.45), 0 0 90px rgba(31,94,255,.25); }
+  .card.bare .cta { margin-top: 28px; }
+  .card.bare .btn-glow { background: var(--blue); color: #fff; box-shadow: 0 0 0 1px rgba(77,130,255,.6), 0 0 28px rgba(31,94,255,.6), 0 0 60px rgba(31,94,255,.3); transition: background .15s, box-shadow .2s; }
+  .card.bare .btn-glow:hover { background: var(--blue-hi); box-shadow: 0 0 0 1px rgba(77,130,255,.8), 0 0 36px rgba(31,94,255,.75), 0 0 80px rgba(31,94,255,.4); }
   .fine { font-size: 13px; color: var(--muted); text-align: center; margin-top: 10px; }
 
   .nav { display: flex; justify-content: space-between; max-width: 720px; margin: 14px auto 0; }
@@ -202,9 +208,9 @@
     <!-- ============ STEP 1 ============ -->
     <section data-step="welcome" hidden>
       <div class="head"><h1>Step 1: Welcome to Tradie Ads</h1><p>Watch this short video first. It explains how onboarding works, then continue.</p></div>
-      <div class="card">
+      <div class="card bare">
         <div class="video" data-video="welcome"></div>
-        <div class="cta"><button class="btn btn-dark" data-next>Continue to Step 2 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+        <div class="cta"><button class="btn btn-glow" data-next>Continue to Step 2 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
       </div>
     </section>
 
