@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#070b14">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Dancing+Script:wght@600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #070b14; --bg-2: #0c1220; --panel: #111a2e; --line: #1e2a44;
@@ -120,8 +120,25 @@
   .agree-doc p, .agree-doc ul { margin-bottom: 8px; } .agree-doc ul { padding-left: 20px; }
   .agree-doc .empty { color: var(--muted); text-align: center; padding: 40px 10px; }
   .agree-doc:focus { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .agree-doc .doc-logo { width: 150px; margin: 4px auto 14px; }
+  .agree-doc h2 { text-align: center; }
+  .agree-doc table { width: 100%; border-collapse: collapse; margin: 8px 0 10px; font-size: 13px; }
+  .agree-doc th, .agree-doc td { border: 1px solid #cfd6e4; padding: 6px 8px; text-align: left; vertical-align: top; }
+  .agree-doc th { background: #eef2fb; color: var(--ink); }
+  .agree-doc [data-f] { border-radius: 4px; padding: 0 4px; }
+  .agree-doc [data-f].blank { background: #fef3c7; color: #92400e; }
+  .agree-doc [data-f].filled { background: #e9f0ff; color: var(--ink); font-weight: 600; }
+  .agree-doc .script { font: 600 30px/1.2 "Dancing Script", "Snell Roundhand", "Segoe Script", cursive; color: #1e3a8a; background: none !important; padding: 0 !important; }
+  .agree-doc .sigs p { margin-bottom: 4px; }
+  .grid-f { display: grid; gap: 0 12px; grid-template-columns: 1fr; }
+  @media (min-width: 600px) { .grid-f { grid-template-columns: 1fr 1fr; } .grid-f .full { grid-column: 1 / -1; } }
+  select, textarea { width: 100%; border: 1.5px solid var(--field); border-radius: 12px; padding: 12px 14px; font: 400 16px Inter, sans-serif; color: var(--ink); background: #fff; }
+  select { height: 50px; padding: 0 12px; }
+  textarea { min-height: 84px; resize: vertical; }
+  select:focus, textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(31,94,255,.15); }
+  .form-title { font: 800 18px/1.2 Archivo, sans-serif; color: var(--ink); margin: 22px 0 2px; }
   .scroll-hint { font-size: 13px; color: var(--muted); text-align: center; }
-  input.sig { font: 600 22px/1 "Brush Script MT", "Segoe Script", cursive; letter-spacing: .01em; }
+  input.sig { font: 600 24px/1 "Dancing Script", "Snell Roundhand", "Segoe Script", cursive; letter-spacing: .01em; }
   .signed { background: #ecfdf3; border: 1px solid #bbf7d0; color: #14532d; border-radius: 12px; padding: 14px 16px; margin-top: 16px; font-size: 15px; }
   .sub { font-size: 18px; color: var(--ink); margin: 24px 0 4px; }
   .cols { display: grid; gap: 12px; grid-template-columns: 1fr; margin-top: 12px; }
@@ -193,20 +210,32 @@
 
     <!-- ============ STEP 2 ============ -->
     <section data-step="agreement" hidden>
-      <div class="head"><h1>Step 2: Sign the agreement</h1><p>Watch the video, then read the agreement below. The guarantee from your call is in it. Type your name at the bottom and submit to sign.</p></div>
+      <div class="head"><h1>Step 2: Sign the agreement</h1><p>Watch the video, then read the agreement below. The guarantee from your call is in it. Fill in the blanks, type your name at the bottom and submit to sign.</p></div>
       <div class="card">
         <div class="video" data-video="agreement"></div>
         <div class="agree-doc" data-agreement-doc tabindex="0" aria-label="Service agreement"></div>
         <p class="scroll-hint">Scroll to read the full agreement.</p>
 
         <form data-form="sign" novalidate>
-          <label class="f" for="f-sig" style="margin-top:18px">Type your full name to sign<span class="req">*</span></label>
+          <p class="form-title">Fill in the blanks</p>
+          <p class="help" style="margin-top:0">These complete Section 1 of the agreement. You'll see them appear above as you type.</p>
+          <div class="grid-f">
+            <div class="full"><label class="f" for="a-legal">Legal business name<span class="req">*</span></label><input id="a-legal" name="legal_name" type="text" autocomplete="organization"></div>
+            <div><label class="f" for="a-type">Business type<span class="req">*</span></label><select id="a-type" name="entity_type"><option value="">Choose…</option><option>LLC</option><option>corporation</option><option>sole proprietor</option></select></div>
+            <div><label class="f" for="a-state">State<span class="req">*</span></label><input id="a-state" name="state" type="text" autocomplete="address-level1" placeholder="e.g. Florida"></div>
+            <div class="full"><label class="f" for="a-addr">Business address<span class="req">*</span></label><input id="a-addr" name="address" type="text" autocomplete="street-address" placeholder="Street, city, state, ZIP"></div>
+            <div class="full"><label class="f" for="a-title">Your title<span class="req">*</span></label><input id="a-title" name="title" type="text" autocomplete="organization-title" placeholder="e.g. Owner"></div>
+            <div class="full"><label class="f" for="a-area">Your service area<span class="req">*</span></label><textarea id="a-area" name="service_area" placeholder="Cities, counties, ZIP codes, or a radius in miles from your address"></textarea></div>
+          </div>
+          <p class="form-title">Sign</p>
+          <label class="f" for="f-sig">Type your full name to sign<span class="req">*</span></label>
           <input id="f-sig" name="signature" type="text" class="sig" autocomplete="name" placeholder="Your full name">
           <label class="check"><input type="checkbox" name="agree"> <span>I've read the full agreement, and typing my name above is my electronic signature on behalf of <b data-sign-biz>my business</b>.</span></label>
           <p class="err" data-err hidden></p>
           <div class="actions"><button class="btn btn-primary btn-block" type="submit">Submit signature</button></div>
         </form>
-        <div class="signed" data-signed hidden>✓ Signed by <b data-signed-name></b> on <span data-signed-date></span>. A copy will be emailed to <b data-signed-email></b> for your records.</div>
+        <div class="signed" data-signed hidden>✓ Signed by <b data-signed-name></b> on <span data-signed-date></span>. A copy will be emailed to <b data-signed-email></b> for your records.
+          <div style="margin-top:10px"><button type="button" class="btn btn-ghost" data-print style="min-height:42px">Save a PDF copy</button></div></div>
 
         <div class="cta"><button class="btn btn-dark" data-next data-needs="agreement" disabled>Continue to Step 3 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
       </div>
@@ -245,7 +274,7 @@
           </ul></div>
         </div>
 
-        <div class="note"><b>Billing:</b> monthly, with no long-term lock-in. Our fee covers management only. Your ad spend is separate and is charged to your own ad account. For month one we recommend <b>$1,000–1,500</b> in ad spend while we test.</div>
+        <div class="note"><b>Billing:</b> $1,000 USD a month, billed monthly with no long-term lock-in. That fee covers management only. Your ad spend is separate, charged to your own ad account, with a minimum of <b>$2,000 USD a month</b> (about $67 a day). The 30-lead guarantee requires that minimum. Full terms are in the agreement you signed in Step 2.</div>
         <div class="note"><b>How to make this work:</b> ask questions (email <a href="mailto:admin@tradie-ads.com">admin@tradie-ads.com</a>), reply quickly when we need footage or approvals, judge results on the trend rather than a single day, and give 24 hours' notice to reschedule a call.</div>
 
         <div class="cta"><button class="btn btn-dark" data-next>Continue to Step 4 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
@@ -343,7 +372,155 @@
 <!-- ===== AGREEMENT TEXT =====
      Paste the full service agreement as HTML inside this template (<h2>, <h3>, <p>, <ul>).
      Then bump CONFIG.agreementVersion (e.g. "2026-11-v1") so every signature records which version was signed. -->
-<template id="agreement-text"></template>
+<template id="agreement-text">
+<img class="doc-logo" src="assets/logo-dark.png" alt="Tradie Ads">
+<h2>Client Services Agreement &amp; 30-Lead Guarantee</h2>
+<p>This Client Services Agreement (the "Agreement") is entered into on the Effective Date below between the Provider and the Client named here. The Provider will run paid advertising for the Client's electrical services business and guarantees 30 Exclusive Qualified Leads in the first 30 days of ads launching, or the Client gets the Service Fee back.</p>
+
+<h3>1. Parties</h3>
+<p>This Agreement is made on <span data-f="date"></span> (the <b>"Effective Date"</b>) between:</p>
+<p><b>13541398 Canada Inc.</b>, a corporation incorporated under the <i>Canada Business Corporations Act</i> (Corporation No. 1354139-8), operating as <b>Tradie Ads</b>, with its address at 20286 72B Avenue, Langley, BC V2Y 3X4, Canada, represented by Ethan Eigenfeldt, Owner &amp; Director (the <b>"Provider"</b>);</p>
+<p style="text-align:center">and</p>
+<p><span data-f="legal_name"></span> (Client's legal business name), a <span data-f="entity_type"></span> (LLC, corporation or sole proprietor) located in the State of <span data-f="state"></span>, with its business address at <span data-f="address"></span>, represented by <span data-f="rep"></span> (name and title), reachable at <span data-f="email"></span> (email) and <span data-f="phone"></span> (phone) (the <b>"Client"</b>).</p>
+<p>The Client's service area for this Agreement is <span data-f="service_area"></span> (cities, counties, ZIP codes, or a radius in miles from the Client's address).</p>
+<p>The Provider and the Client are each a "Party" and together the "Parties."</p>
+
+<h3>2. Services</h3>
+<p>The Provider will plan, build and manage a paid lead-generation campaign for the Client's electrical services (EV charger installation, home generators and electrical panel upgrades), including:</p>
+<ul>
+<li>Ad strategy, targeting and audience setup on Meta (Facebook and Instagram) and any other platform agreed in writing</li>
+<li>Ad copy and creative (images and/or video)</li>
+<li>A lead capture form or landing page that collects every Qualified Lead field in Section 4</li>
+<li>Real-time lead delivery to the Client by email, SMS or CRM</li>
+<li>Ongoing campaign monitoring and optimization during the Guarantee Period</li>
+</ul>
+<p>The Provider does not contact, qualify by phone, quote, sell to or install for any lead. Following up and closing jobs is the Client's responsibility.</p>
+
+<h3>3. Fees and Ad Spend</h3>
+<p>All amounts are in <b>US dollars (USD)</b>.</p>
+<table>
+<tr><th>Item</th><th>Amount</th><th>When due</th></tr>
+<tr><td>Monthly Service Fee</td><td>$1,000 USD / month</td><td>First month before work begins, then in advance each month</td></tr>
+<tr><td>Ad spend (minimum)</td><td>$2,000 USD / month</td><td>Paid by the Client directly to the ad platform</td></tr>
+<tr><td>Additional services (optional)</td><td>Quoted per month</td><td>Added only by written agreement</td></tr>
+</table>
+<ul>
+<li><b>Ad spend is separate from the Service Fee.</b> The Client pays it directly to Meta (or the agreed platform) on the Client's own card or ad account. Ad spend is never refundable by the Provider, including under the Guarantee.</li>
+<li>After the first 30 days, the Service Fee stays at $1,000 USD per month. The Client may add further services at any time for an additional monthly fee agreed in writing.</li>
+<li>Work starts when the first Service Fee clears and the Client has provided the access and approvals in Section 5.</li>
+<li>Late payments may pause the campaign. A paused campaign pauses the Guarantee Period clock.</li>
+</ul>
+
+<h3>4. The 30-Lead Guarantee</h3>
+<p>The Provider guarantees the Client will receive at least <b>30 Exclusive Qualified Leads within the first 30 days after the Launch Date</b> (the "Guarantee Period"). If fewer than 30 are delivered, the Client is entitled to the remedy in Section 7.</p>
+<p><b>Launch Date</b> means the date the Client's first ad is approved by the platform and begins delivering. The Provider will confirm it to the Client in writing (email or text).</p>
+<p><b>What counts as a Qualified Lead</b></p>
+<p>A Qualified Lead is a homeowner who submits all of the following through the Provider's form or landing page:</p>
+<ol>
+<li>Full name</li>
+<li>Email address</li>
+<li>Phone number</li>
+<li>Home location (address or city and ZIP code) within the Client's service area</li>
+<li>Service needed: EV charger installation, home generator, or panel upgrade</li>
+<li>Answers to the qualifying questions for that service (table below)</li>
+<li>When they want the work done</li>
+</ol>
+<table>
+<tr><th>Service</th><th>Qualifying questions</th></tr>
+<tr><td>EV charger installation</td><td>Do they currently have a charger (yes or no); charger type; approximate distance from the electrical panel to the charger location</td></tr>
+<tr><td>Home generator</td><td>Whole-home or partial backup; fuel available at the home (natural gas, propane, or not sure)</td></tr>
+<tr><td>Panel upgrade</td><td>Current panel size in amps (or not sure); reason for the upgrade (EV charger, heat pump, renovation, old or unsafe panel, other)</td></tr>
+</table>
+<p>Leads for all three services count together toward the 30.</p>
+<p><b>What counts as Exclusive</b></p>
+<p>Each lead is generated from campaigns run solely for the Client. The Provider will not sell, share or deliver that lead to any other contractor or business.</p>
+<p><b>What does not count toward the 30</b></p>
+<ul>
+<li>Duplicates of a lead already delivered in the Guarantee Period (same phone or email)</li>
+<li>Submissions with a fake name, a disconnected or invalid phone number, or an invalid email address</li>
+<li>Homes located outside the Client's service area listed in Section 1</li>
+<li>Test, spam or bot submissions, and submissions by the Client or the Client's staff</li>
+</ul>
+<p><b>Disputing a lead</b></p>
+<p>The Client must report any lead it believes is invalid within <b>7 days</b> of delivery, by email, with the reason. Leads not disputed within 7 days count as Qualified Leads. The Provider will review each dispute in good faith and will replace confirmed invalid leads at no cost.</p>
+
+<h3>5. Conditions of the Guarantee</h3>
+<p>The Guarantee applies only if the Client does all of the following during the Guarantee Period:</p>
+<ul>
+<li>Pays the Service Fee in full before launch</li>
+<li>Funds at least $2,000 USD of ad spend across the 30 days (about $67 per day), with no pauses, budget cuts or declined payments</li>
+<li>Gives the Provider access to its ad account, business page and any other assets reasonably requested within 3 business days of signing</li>
+<li>Approves or comments on ad creative within 2 business days of receiving it</li>
+<li>Does not edit, pause or change the campaigns, targeting or forms without the Provider's written agreement</li>
+<li>Keeps a service area of at least <span data-f="radius"></span> miles radius (or the ZIP codes listed in Section 1)</li>
+<li>Holds a valid licence and any permits required to perform the advertised services</li>
+</ul>
+<p>If the Client breaks a condition, the Guarantee is void. If the ad platform rejects ads or restricts the Client's account for reasons tied to the Client's business, the Guarantee Period is paused until ads are running again.</p>
+
+<h3>6. What Is Not Guaranteed</h3>
+<p>The Guarantee covers the number of leads delivered only. The Provider does not guarantee that any lead will answer, book, buy, or result in a sale, job or specific revenue. Lead quality beyond the definition in Section 4 is not guaranteed.</p>
+
+<h3>7. Refund Remedy</h3>
+<p>If fewer than 30 Exclusive Qualified Leads are delivered in the Guarantee Period and the Client has met every condition in Section 5, the Client may choose one of the following:</p>
+<ol>
+<li><b>Full refund of the first month's Service Fee ($1,000 USD).</b> The Client must request it by email within <b>14 days</b> after the Guarantee Period ends. The Provider will pay it within <b>14 business days</b> of the request, to the original payment method.</li>
+<li><b>Free continuation.</b> The Provider keeps running and managing the campaign, with no Service Fee, until the 30th Qualified Lead is delivered. The Client keeps paying ad spend.</li>
+</ol>
+<p>The refund covers the Service Fee only. Ad spend paid to the platform is not refundable. This refund is the Client's sole and exclusive remedy for a missed Guarantee.</p>
+
+<h3>8. Term and Cancellation</h3>
+<ul>
+<li><b>No long-term contract.</b> Service runs month to month from the Effective Date.</li>
+<li><b>Cancel anytime.</b> Either Party may cancel at any time by written notice (email is enough). Cancellation takes effect at the end of the current paid month, and no further Service Fees are charged.</li>
+<li>Service Fees already paid are not refunded, except under Section 7.</li>
+<li>If the Client cancels before the Guarantee Period ends, the Guarantee no longer applies.</li>
+</ul>
+
+<h3>9. Client Responsibilities and Compliance</h3>
+<ul>
+<li>The Client is responsible for how it contacts leads, including compliance with the Telephone Consumer Protection Act (TCPA), CAN-SPAM, state telemarketing and do-not-call rules, and any other US federal, state or local law.</li>
+<li>The Provider's forms will include a consent notice for the Client to contact the lead. The Client will honour opt-out requests promptly.</li>
+<li>The Client confirms that the services, offers and claims it asks the Provider to advertise are accurate and that it is licensed to perform them.</li>
+<li>The Client will use lead data only to serve that lead and will protect it from unauthorized access.</li>
+</ul>
+
+<h3>10. Ownership</h3>
+<p>Leads delivered to the Client belong to the Client. The ad creative, copy, landing pages and campaign structure built by the Provider remain the Provider's property. The Client receives a licence to use them while services are active.</p>
+
+<h3>11. Confidentiality</h3>
+<p>Each Party will keep the other's non-public business information, pricing and lead data confidential and use it only to perform this Agreement.</p>
+
+<h3>12. Limitation of Liability</h3>
+<p>The Provider's total liability under this Agreement is limited to the Service Fees paid by the Client in the 3 months before the claim. Neither Party is liable for lost profits, lost revenue, or indirect or consequential damages. The Provider is not responsible for ad platform outages, policy changes, account restrictions or algorithm changes outside its control.</p>
+
+<h3>13. Chargebacks</h3>
+<p>The Client agrees to request any refund under Section 7 before disputing a charge with its bank or card issuer. A chargeback filed without first following Section 7 voids the Guarantee.</p>
+
+<h3>14. General</h3>
+<ul>
+<li><b>Independent contractor.</b> The Provider is an independent contractor, not an employee, partner or agent of the Client.</li>
+<li><b>Governing law.</b> This Agreement is governed by the laws of the Province of British Columbia and the federal laws of Canada that apply there. The Parties agree to the courts of British Columbia for any dispute.</li>
+<li><b>Entire agreement.</b> This is the full agreement between the Parties and replaces any earlier promises, sales calls, or messages. Changes must be in writing and signed by both Parties.</li>
+<li><b>Severability.</b> If any part is found unenforceable, the rest stays in effect.</li>
+<li><b>Electronic signatures.</b> This Agreement may be signed electronically and in counterparts, each of which counts as an original.</li>
+</ul>
+
+<h3>15. Signatures</h3>
+<p>By signing, each Party confirms it has read, understood and agrees to this Agreement, including the conditions of the 30-Lead Guarantee.</p>
+<div class="sigs">
+<p><b>Provider — 13541398 Canada Inc., operating as Tradie Ads</b></p>
+<p>Signature: <span class="script">Ethan Eigenfeldt</span></p>
+<p>Name: Ethan Eigenfeldt</p>
+<p>Title: Owner &amp; Director</p>
+<p>Date: <span data-f="date"></span></p>
+<p style="margin-top:14px"><b>Client</b></p>
+<p>Signature: <span data-f="sig"></span></p>
+<p>Name: <span data-f="sig_name"></span></p>
+<p>Title: <span data-f="title"></span></p>
+<p>Company: <span data-f="legal_name"></span></p>
+<p>Date: <span data-f="sig_date"></span></p>
+</div>
+</template>
 
 <footer class="foot">
   <img src="assets/logo-white.png" alt="Tradie Ads">
@@ -358,11 +535,13 @@ var CONFIG = {
   // Every step POSTs the client's answers to it (see ghl/onboarding.md).
   webhookUrl: "",
   // Version label saved with each signature. Bump it whenever the agreement text in <template id="agreement-text"> changes.
-  agreementVersion: "draft",
+  agreementVersion: "2026-11-18",
+  // Section 5 minimum service-area radius (miles). Blank = the line shows "______".
+  minRadiusMiles: "",
   // One-click Facebook connect link, if you use a tool for it. Blank = button opens the manual steps.
   fbConnectUrl: "",
   // Tradie Ads' Meta Business Manager ID (Business Settings → Business info).
-  businessId: "",
+  businessId: "160308512414464",
   // GHL calendar for the onboarding call.
   calendarId: "A1TDWQK5Speny62JOZUc",
   // YouTube/Loom/Vimeo EMBED URLs, e.g. https://www.loom.com/embed/abc123 . Blank = placeholder.
@@ -433,6 +612,11 @@ var CONFIG = {
       if (has) $("[data-sheet]").href = state.data.sheet;
     }
     if (step === "book") mountCalendar();
+    if (step === "agreement") {
+      var ln = fsig.elements.legal_name;
+      if (!ln.value && state.data.business) { ln.value = state.data.business; state.agreement.legal_name = ln.value; save(); }
+      fillDoc();
+    }
     if (step === "leads") {
       // Seed empty first rows with the details from the Start step.
       var e0 = $('[data-multi="lead_emails"] input'), p0 = $('[data-multi="lead_phones"] input');
@@ -488,26 +672,69 @@ var CONFIG = {
   if (tpl && tpl.innerHTML.trim()) doc.innerHTML = tpl.innerHTML;
   else doc.innerHTML = '<p class="empty">The service agreement will appear here.</p>';
   var fsig = $('[data-form="sign"]'), ab = $('[data-needs="agreement"]');
+  var AF = ["legal_name", "entity_type", "state", "address", "title", "service_area"];
+  state.agreement = state.agreement || {};
+  function today() { return new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }); }
+  function fillDoc() {
+    var a = state.agreement, g = state.signature, d = state.data;
+    var sigName = g ? g.name : (fsig.elements.signature.value.trim() || "");
+    var vals = {
+      date: g ? new Date(g.at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : today(),
+      legal_name: a.legal_name, entity_type: a.entity_type, state: a.state, address: a.address,
+      rep: [sigName || d.name, a.title].filter(Boolean).join(", "),
+      email: d.email, phone: d.phone, service_area: a.service_area, title: a.title,
+      radius: CONFIG.minRadiusMiles,
+      sig: g ? g.name : "", sig_name: g ? g.name : "",
+      sig_date: g ? new Date(g.at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""
+    };
+    $$("[data-f]", doc).forEach(function (el) {
+      var k = el.getAttribute("data-f"), v = (vals[k] || "").toString().trim();
+      el.textContent = v || "____________";
+      el.className = v ? (k === "sig" ? "script" : "filled") : "blank";
+    });
+  }
+  AF.forEach(function (k) {
+    var el = fsig.elements[k];
+    if (state.agreement[k]) el.value = state.agreement[k];
+    else if (k === "legal_name" && state.data.business) el.value = state.data.business;
+    state.agreement[k] = el.value.trim();
+    el.addEventListener("input", function () { state.agreement[k] = el.value.trim(); save(); fillDoc(); });
+    el.addEventListener("change", function () { state.agreement[k] = el.value.trim(); save(); fillDoc(); });
+  });
+  fsig.elements.signature.addEventListener("input", fillDoc);
+  $("[data-print]").addEventListener("click", function () {
+    var w = window.open("", "_blank"); if (!w) return;
+    var css = 'body{font:14px/1.6 Arial,Helvetica,sans-serif;color:#111;max-width:760px;margin:30px auto;padding:0 20px}h2{text-align:center;font-size:22px}h3{font-size:16px;margin:18px 0 6px}img{display:block;width:170px;margin:0 auto 12px}table{width:100%;border-collapse:collapse;margin:8px 0}th,td{border:1px solid #999;padding:5px 7px;text-align:left;vertical-align:top}th{background:#eee}.script{font:600 30px "Dancing Script","Snell Roundhand","Segoe Script",cursive;color:#1e3a8a}.blank{color:#999}';
+    w.document.write('<!doctype html><html><head><meta charset="utf-8"><base href="' + location.href.split("?")[0].replace(/[^/]*$/, "") + '"><title>Tradie Ads Agreement - ' + (state.agreement.legal_name || "") + '</title><link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet"><style>' + css + '</style></head><body>' + doc.innerHTML + '</body></html>');
+    w.document.close(); w.focus(); setTimeout(function () { w.print(); }, 400);
+  });
   function showSigned() {
     var g = state.signature; if (!g) return;
     fsig.hidden = true; $("[data-signed]").hidden = false; ab.disabled = false;
     $("[data-signed-name]").textContent = g.name;
     $("[data-signed-date]").textContent = new Date(g.at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
     $("[data-signed-email]").textContent = state.data.email || "your email";
+    fillDoc();
   }
   ab.disabled = !state.signature;
   fsig.addEventListener("submit", function (e) {
     e.preventDefault();
     var name = fsig.elements.signature.value.trim(), err = $("[data-err]", fsig);
     fsig.elements.signature.classList.remove("bad");
+    var missing = AF.filter(function (k) { var el = fsig.elements[k]; el.classList.remove("bad"); if (!el.value.trim()) { el.classList.add("bad"); return true; } return false; });
+    if (missing.length) { err.textContent = "Fill in every blank above before signing."; err.hidden = false; fsig.elements[missing[0]].focus(); return; }
     if (name.split(/\s+/).length < 2) { fsig.elements.signature.classList.add("bad"); err.textContent = "Type your full name (first and last) to sign."; err.hidden = false; return; }
     if (!fsig.elements.agree.checked) { err.textContent = "Tick the box to confirm you've read the agreement."; err.hidden = false; return; }
     err.hidden = true;
     state.signature = { name: name, at: new Date().toISOString(), version: CONFIG.agreementVersion };
     save();
-    send("agreement_signed", { signature_name: name, signed_at: state.signature.at, agreement_version: CONFIG.agreementVersion, user_agent: navigator.userAgent });
+    var a = state.agreement;
+    send("agreement_signed", { signature_name: name, signer_title: a.title, signed_at: state.signature.at, agreement_version: CONFIG.agreementVersion,
+      legal_name: a.legal_name, entity_type: a.entity_type, state: a.state, business_address: a.address, service_area: a.service_area,
+      min_radius_miles: CONFIG.minRadiusMiles, user_agent: navigator.userAgent });
     showSigned();
   });
+  fillDoc();
   showSigned();
 
   // Facebook
