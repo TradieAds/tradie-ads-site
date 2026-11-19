@@ -87,7 +87,14 @@
   .vp-time { font: 500 13px/1 Inter, sans-serif; margin-left: 6px; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .vp-vol { margin-left: auto; display: flex; align-items: center; }
   .vp-vol input { width: 90px; accent-color: var(--blue-hi); }
-  @media (max-width: 420px) { .vp-vol input { width: 60px; } .vp-time { font-size: 12px; } }
+  .vp-speed { margin-left: auto; position: relative; }
+  .vp-speed + .vp-vol { margin-left: 0; }
+  .vp-ctl .vp-rate { width: auto; min-width: 48px; padding: 0 8px; font: 700 14px/1 Inter, sans-serif; font-variant-numeric: tabular-nums; }
+  .vp-menu { position: absolute; right: 0; bottom: calc(100% + 8px); background: rgba(12,18,32,.96); border: 1px solid rgba(255,255,255,.14); border-radius: 12px; padding: 6px; display: grid; gap: 2px; min-width: 96px; box-shadow: 0 12px 30px rgba(0,0,0,.45); z-index: 3; }
+  .vp-menu[hidden] { display: none; }
+  .vp-ctl .vp-menu button { width: 100%; height: 34px; display: flex; align-items: center; justify-content: flex-start; padding: 0 12px; font: 600 14px/1 Inter, sans-serif; border-radius: 8px; }
+  .vp-ctl .vp-menu button[aria-checked="true"] { background: var(--blue); }
+  @media (max-width: 420px) { .vp-vol input { width: 52px; } .vp-time { font-size: 12px; } .vp-ctl button { width: 36px; } .vp-ctl .vp-rate { min-width: 42px; padding: 0 4px; } }
 
   label.f { display: block; font-weight: 600; font-size: 14px; color: var(--ink); margin: 16px 0 6px; }
   label.f:first-child { margin-top: 0; }
@@ -710,6 +717,9 @@ var CONFIG = {
     vol: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z" fill="currentColor"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>',
     mute: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z" fill="currentColor"/><path d="m22 9-6 6M16 9l6 6"/></svg>'
   };
+  // Playback speed: one choice shared by every video and remembered on this device.
+  var RATES = [1, 1.25, 1.5, 1.75, 2], speed = 1;
+  try { var saved = Number(localStorage.getItem("ta_video_speed")); if (RATES.indexOf(saved) > -1) speed = saved; } catch (e) {}
   function fmt(t) { t = Math.max(0, Math.floor(t || 0)); return Math.floor(t / 60) + ":" + ("0" + t % 60).slice(-2); }
   function mountPlayer(box, src) {
     box.classList.add("vp");
@@ -721,6 +731,8 @@ var CONFIG = {
       '<button type="button" data-a="toggle" aria-label="Play or pause">' + IC.pause + '</button>' +
       '<button type="button" data-a="fwd" aria-label="Forward 10 seconds">' + IC.fwd + '</button>' +
       '<span class="vp-time">0:00 / 0:00</span>' +
+      '<span class="vp-speed"><button type="button" class="vp-rate" data-a="rate" aria-label="Playback speed" aria-haspopup="true" aria-expanded="false">1x</button>' +
+      '<span class="vp-menu" role="menu" hidden>' + RATES.map(function (r) { return '<button type="button" role="menuitemradio" data-rate="' + r + '">' + r + 'x</button>'; }).join("") + '</span></span>' +
       '<span class="vp-vol"><button type="button" data-a="mute" aria-label="Mute or unmute">' + IC.vol + '</button><input type="range" min="0" max="1" step="0.05" value="1" aria-label="Volume"></span>' +
       '</div></div>';
     var v = $("video", box), bar = $(".vp-bar", box), prog = $(".vp-prog span", box), time = $(".vp-time", box);
@@ -732,10 +744,29 @@ var CONFIG = {
     function start() { // restart from the top with sound on
       box.classList.add("live"); bar.hidden = false;
       v.loop = false; v.muted = false; v.volume = Number(range.value) || 1; volIcon();
+      v.playbackRate = speed; v.defaultPlaybackRate = speed;
       try { v.currentTime = 0; } catch (e) {}
       var p = v.play(); if (p && p.catch) p.catch(function () {});
     }
     $(".vp-sound", box).addEventListener("click", start);
+    var rateBtn = $('[data-a="rate"]', box), menu = $(".vp-menu", box);
+    function showRate() {
+      rateBtn.textContent = speed + "x";
+      $$("[data-rate]", menu).forEach(function (b) { b.setAttribute("aria-checked", Number(b.getAttribute("data-rate")) === speed ? "true" : "false"); });
+    }
+    function closeMenu() { menu.hidden = true; rateBtn.setAttribute("aria-expanded", "false"); }
+    rateBtn.addEventListener("click", function (e) { e.stopPropagation(); showRate(); menu.hidden = !menu.hidden; rateBtn.setAttribute("aria-expanded", String(!menu.hidden)); });
+    $$("[data-rate]", menu).forEach(function (b) {
+      b.addEventListener("click", function (e) {
+        e.stopPropagation();
+        speed = Number(b.getAttribute("data-rate"));
+        try { localStorage.setItem("ta_video_speed", String(speed)); } catch (err) {}
+        $$(".vp").forEach(function (o) { if (o.classList.contains("live")) { o._v.playbackRate = speed; o._v.defaultPlaybackRate = speed; } if (o._showRate) o._showRate(); });
+        closeMenu();
+      });
+    });
+    document.addEventListener("click", function (e) { if (!menu.hidden && !e.target.closest(".vp-speed")) closeMenu(); });
+    box._showRate = showRate; showRate();
     v.addEventListener("click", function () { if (!live()) start(); else if (v.paused) v.play(); else v.pause(); });
     tog.addEventListener("click", function () { if (v.paused) v.play(); else v.pause(); });
     $('[data-a="back"]', box).addEventListener("click", function () { v.currentTime = Math.max(0, v.currentTime - 10); });
@@ -760,7 +791,7 @@ var CONFIG = {
     $$(".vp").forEach(function (box) {
       var v = box._v, here = box.closest("[data-step]").getAttribute("data-step") === step;
       if (!here) { if (!v.paused) v.pause(); return; }
-      if (!box.classList.contains("live")) { v.muted = true; v.loop = true; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+      if (!box.classList.contains("live")) { v.muted = true; v.loop = true; v.playbackRate = 1; var p = v.play(); if (p && p.catch) p.catch(function () {}); }
     });
   }
   $$("[data-video]").forEach(function (v) {
