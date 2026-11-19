@@ -235,8 +235,8 @@
     <!-- ============ START: your details ============ -->
     <section data-step="start">
       <div class="head">
-        <h1>Welcome to Tradie Ads.</h1>
-        <p>Confirm your details, then walk through a short guided setup. Set aside about 30 minutes somewhere you won't be interrupted. Your progress saves on this device.</p>
+        <h1>Create your account</h1>
+        <p>This is your login for your Tradie Ads leads dashboard, where every lead shows up the moment it comes in. Then we'll walk through a short guided setup. Set aside about 30 minutes somewhere you won't be interrupted.</p>
       </div>
       <form class="card narrow" data-form="start" novalidate>
         <label class="f" for="f-name">Your name<span class="req">*</span></label>
@@ -244,7 +244,7 @@
 
         <label class="f" for="f-email">Email<span class="req">*</span></label>
         <div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><input id="f-email" name="email" type="email" autocomplete="email" placeholder="jane@yourbusiness.com" required></div>
-        <p class="help">Use the email you paid with, so we can match you up.</p>
+        <p class="help">Use the email you paid with. It's also how you'll sign in to your leads dashboard.</p>
 
         <label class="f" for="f-phone">Mobile number<span class="req">*</span></label>
         <div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg><input id="f-phone" name="phone" type="tel" autocomplete="tel" placeholder="+1 (555) 000-0000" required></div>
@@ -254,7 +254,7 @@
         <p class="help" data-biz-help hidden>We pulled this from your purchase. Just confirm it's right.</p>
 
         <p class="err" data-err hidden></p>
-        <div class="actions"><button class="btn btn-primary btn-block" type="submit">Start onboarding <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+        <div class="actions"><button class="btn btn-primary btn-block" type="submit">Create account and start <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
       </form>
     </section>
 
@@ -312,7 +312,7 @@
       <form data-form="leads" novalidate>
       <div class="video" data-video="leads"></div>
       <div class="card">
-        <p style="color:var(--muted);font-size:15px;margin-top:0">During the trial, every lead is emailed and texted to you the moment it comes in, and added to your own leads spreadsheet. You'll get its link at the end of onboarding.</p>
+        <p style="color:var(--muted);font-size:15px;margin-top:0">During the trial, every lead is emailed and texted to you the moment it comes in, and shows up in your leads dashboard. You'll go straight there at the end of onboarding.</p>
 
         <label class="f">Email(s) you'd like leads sent to<span class="req">*</span></label>
         <div class="multi" data-multi="lead_emails" data-type="email" data-ph="you@yourbusiness.com"></div>
@@ -558,6 +558,7 @@
   <div style="margin-top:8px"><a href="privacy.html">Privacy</a>·<a href="terms.html">Terms</a></div>
 </footer>
 
+<script src="assets/dashboard-config.js"></script>
 <script>
 /* ===================== EDIT THESE ===================== */
 var CONFIG = {
@@ -631,6 +632,18 @@ var CONFIG = {
     urls.forEach(function (u) { try { fetch(u, { method: "POST", mode: "no-cors", body: body, keepalive: true }); } catch (e) {} });
   }
 
+  // Leads dashboard account (apps-script/Leads.gs). Safe to call more than once: existing accounts aren't changed.
+  var LEADS_API = window.TA_LEADS_API || "";
+  function registerAccount() {
+    if (!LEADS_API) return;
+    var d = state.data;
+    try {
+      fetch(LEADS_API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, keepalive: true,
+        body: JSON.stringify({ action: "register", email: d.email, name: d.name, phone: d.phone, business: d.business, sheet: d.sheet || "" }) }).catch(function () {});
+    } catch (e) {}
+  }
+  function dashboardUrl() { return "leads.html?email=" + encodeURIComponent(state.data.email || "") + "&send=1&welcome=1"; }
+
   // Progress bars
   var bars = $("[data-bars]");
   for (var i = 0; i < 8; i++) bars.appendChild(document.createElement("span"));
@@ -650,6 +663,7 @@ var CONFIG = {
     playerFor(step);
     $("[data-who]").textContent = state.data.business || "";
     $("[data-sign-biz]").textContent = state.data.business || "my business";
+    if (step === "done" && LEADS_API && !skim) { registerAccount(); location.href = dashboardUrl(); return; }
     if (step === "done") {
       var has = !!state.data.sheet;
       $("[data-sheet-wrap]").hidden = !has; $("[data-sheet-later]").hidden = has;
@@ -786,6 +800,7 @@ var CONFIG = {
     if (bad.length) { bad.forEach(function (i) { i.classList.add("bad"); }); err.textContent = "Please fill in every field with a valid email and phone number."; err.hidden = false; bad[0].focus(); return; }
     err.hidden = true;
     ["name", "email", "phone", "business"].forEach(function (k) { state.data[k] = el[k].value.trim(); });
+    registerAccount();
     advance();
   });
 

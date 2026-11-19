@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your Leads · Tradie Ads</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="theme-color" content="#070b14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070b14; --panel: #111a2e; --line: #1e2a44;
+    --blue: #1f5eff; --blue-hi: #4d82ff; --blue-dark: #1a50db;
+    --page: #f4f6fb; --card: #fff; --edge: #e3e8f2; --field: #d5dceb; --row: #f7f9fe;
+    --ink: #0a0f1e; --text: #1a2133; --muted: #4a5670; --soft: #93a0bb;
+    --alert: #e5484d; --ok: #16a34a; --new: #fff7d6; --new-edge: #f5c84b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { background: var(--bg); color: var(--text); font: 400 16px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
+  a { color: var(--blue); }
+  h1, h2, h3 { font-family: Archivo, Inter, system-ui, sans-serif; letter-spacing: -.02em; line-height: 1.1; }
+  [hidden] { display: none !important; }
+  button { font: inherit; }
+
+  .top { background: var(--bg); border-bottom: 1px solid var(--line); }
+  .top .in { max-width: 1240px; margin: 0 auto; padding: 0 16px; height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .top img { height: 30px; width: auto; }
+  .top .right { display: flex; align-items: center; gap: 14px; min-width: 0; }
+  .top .who { color: var(--soft); font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .top .out { background: none; border: 1px solid var(--line); color: #c9d2e6; border-radius: 9px; padding: 7px 12px; font-size: 13px; font-weight: 600; cursor: pointer; flex: none; }
+  .top .out:hover { border-color: var(--blue-hi); color: #fff; }
+
+  .stage { flex: 1; color: #eef2fb; padding: 32px 16px 56px;
+    background:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 32px 32px,
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px) 0 0 / 32px 32px,
+      radial-gradient(1200px 600px at 75% 0%, rgba(31,94,255,.26), transparent 60%),
+      var(--bg); }
+  .shell { max-width: 1240px; margin: 0 auto; }
+
+  .card { background: var(--card); color: var(--text); border-radius: 18px; box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+
+  /* ---------- sign in ---------- */
+  .signin { max-width: 460px; margin: 4vh auto 0; padding: 28px 24px; }
+  .signin h1 { color: var(--ink); font-size: 28px; font-weight: 900; }
+  .signin .lede { color: var(--muted); margin: 8px 0 18px; font-size: 15px; }
+  label.f { display: block; font-weight: 600; font-size: 14px; color: var(--ink); margin: 0 0 6px; }
+  .in-field { width: 100%; height: 50px; border: 1.5px solid var(--field); border-radius: 12px; padding: 0 14px; font: 400 16px Inter, sans-serif; color: var(--ink); background: #fff; }
+  .in-field:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(31,94,255,.12); }
+  .in-code { letter-spacing: .4em; font: 700 24px ui-monospace, Menlo, monospace; text-align: center; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 50px; padding: 0 22px; border-radius: 12px; font: 700 16px/1 Inter, sans-serif; border: 0; cursor: pointer; text-decoration: none; }
+  .btn-primary { background: var(--blue); color: #fff; width: 100%; margin-top: 14px; }
+  .btn-primary:hover { background: var(--blue-dark); }
+  .btn-primary[disabled] { opacity: .5; cursor: wait; }
+  .link { background: none; border: 0; color: var(--blue); cursor: pointer; font-size: 14px; font-weight: 600; padding: 0; }
+  .msg { font-size: 14px; margin-top: 10px; }
+  .msg.err { color: var(--alert); }
+  .help { font-size: 13px; color: var(--muted); margin-top: 12px; }
+  .row-between { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; gap: 10px; flex-wrap: wrap; }
+
+  /* ---------- dashboard ---------- */
+  .welcome { display: flex; gap: 16px; align-items: flex-start; padding: 20px 22px; margin-bottom: 22px; position: relative; }
+  .welcome .ic { width: 46px; height: 46px; border-radius: 50%; background: var(--ok); display: grid; place-items: center; flex: none; box-shadow: 0 0 0 7px rgba(22,163,74,.14); }
+  .welcome .ic svg { width: 24px; height: 24px; color: #fff; }
+  .welcome h2 { color: var(--ink); font-size: 22px; }
+  .welcome p { color: var(--muted); font-size: 15px; margin-top: 4px; }
+  .welcome .x { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; border: 0; background: none; border-radius: 8px; color: var(--soft); cursor: pointer; font-size: 22px; line-height: 1; }
+  .welcome .x:hover { background: #eef2fb; color: var(--ink); }
+
+  .titlebar { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  .titlebar h1 { color: #fff; font-size: clamp(28px, 5vw, 40px); font-weight: 900; }
+  .titlebar .biz { color: #b9c4dc; margin-top: 6px; font-size: 15px; }
+  .live { display: inline-flex; align-items: center; gap: 8px; color: #b9c4dc; font-size: 13px; }
+  .live .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(22,163,74,.6); animation: ping 2s infinite; }
+  .live.off .dot { background: var(--soft); animation: none; }
+  @keyframes ping { 70% { box-shadow: 0 0 0 8px rgba(22,163,74,0); } 100% { box-shadow: 0 0 0 0 rgba(22,163,74,0); } }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+  @media (max-width: 720px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+  .stat { background: rgba(17,26,46,.85); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+  .stat small { display: block; font: 700 11px/1 Archivo, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--soft); }
+  .stat b { display: block; font: 900 30px/1 Archivo, sans-serif; color: #fff; margin-top: 10px; font-variant-numeric: tabular-nums; }
+  .stat.hi b { color: var(--blue-hi); }
+
+  .sheet { overflow: hidden; }
+  .toolbar { display: flex; gap: 10px; align-items: center; padding: 14px; border-bottom: 1px solid var(--edge); flex-wrap: wrap; }
+  .search { position: relative; flex: 1; min-width: 200px; }
+  .search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 17px; height: 17px; color: var(--soft); pointer-events: none; }
+  .search input { width: 100%; height: 42px; border: 1.5px solid var(--field); border-radius: 10px; padding: 0 12px 0 38px; font: 400 15px Inter, sans-serif; color: var(--ink); }
+  .search input:focus { outline: none; border-color: var(--blue); }
+  .tool { height: 42px; padding: 0 14px; border-radius: 10px; border: 1.5px solid var(--field); background: #fff; color: var(--ink); font: 600 14px Inter, sans-serif; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .tool:hover { border-color: var(--blue); color: var(--blue); }
+  .tool svg { width: 16px; height: 16px; }
+  .count { font-size: 13px; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--edge); }
+
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th { position: sticky; top: 0; background: #f4f6fb; text-align: left; font: 700 11.5px/1.2 Archivo, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 11px 14px; border-bottom: 1px solid var(--edge); white-space: nowrap; }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--edge); vertical-align: top; color: var(--text); max-width: 280px; overflow-wrap: anywhere; }
+  tbody tr.lead { cursor: pointer; }
+  tbody tr.lead:hover td { background: var(--row); }
+  td.when { white-space: nowrap; color: var(--muted); }
+  td.when b { display: block; color: var(--ink); font-weight: 600; }
+  td.name { font-weight: 600; color: var(--ink); white-space: nowrap; }
+  td.phone { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  td .empty { color: #b3bccd; }
+  .badge { display: inline-block; font: 800 10px/1 Archivo, sans-serif; letter-spacing: .1em; text-transform: uppercase; background: var(--new-edge); color: #4a3500; padding: 4px 6px; border-radius: 5px; margin-left: 6px; vertical-align: 2px; }
+  tr.is-new td { background: var(--new); }
+  tr.flash td { animation: flash 2.4s ease-out; }
+  @keyframes flash { 0% { background: #ffe58a; } 100% { background: var(--new); } }
+  tr.detail td { background: var(--row); padding: 4px 14px 16px; cursor: default; }
+  .qa { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px 22px; padding-top: 10px; }
+  .qa div small { display: block; font-size: 12px; color: var(--muted); font-weight: 600; }
+  .qa div span { color: var(--ink); overflow-wrap: anywhere; }
+  .src { margin-top: 12px; font-size: 12.5px; color: var(--muted); }
+
+  .blank { text-align: center; padding: 56px 20px 60px; color: var(--muted); }
+  .blank .ic { width: 64px; height: 64px; margin: 0 auto 16px; border-radius: 18px; background: #e9f0ff; color: var(--blue); display: grid; place-items: center; }
+  .blank .ic svg { width: 30px; height: 30px; }
+  .blank h3 { color: var(--ink); font-size: 22px; margin-bottom: 8px; }
+  .blank p { max-width: 460px; margin: 0 auto; font-size: 15px; }
+
+  /* Phones: each lead becomes a card */
+  @media (max-width: 760px) {
+    thead { display: none; }
+    table, tbody, tr, td { display: block; width: 100%; max-width: none; }
+    tbody tr.lead { padding: 12px 14px; border-bottom: 1px solid var(--edge); display: flex; flex-direction: column; }
+    tbody tr.lead td { border: 0; padding: 2px 0; background: none !important; }
+    tr.is-new { background: var(--new); }
+    tr.flash { animation: flash 2.4s ease-out; }
+    td.when { order: -1; font-size: 13px; }
+    td.when b { display: inline; margin-right: 6px; }
+    td.name { font-size: 17px; white-space: normal; }
+    td.ans { display: none; }
+    tr.detail td { padding: 0 14px 14px; }
+  }
+
+  .notice { text-align: center; color: #b9c4dc; padding: 60px 16px; }
+  .notice h1 { color: #fff; font-size: 28px; margin-bottom: 10px; }
+  .spin { width: 28px; height: 28px; border: 3px solid rgba(255,255,255,.2); border-top-color: var(--blue-hi); border-radius: 50%; margin: 60px auto; animation: rot .8s linear infinite; }
+  @keyframes rot { to { transform: rotate(360deg); } }
+
+  .foot { background: #000; color: #8a93a8; text-align: center; padding: 26px 16px 30px; font-size: 13px; }
+  .foot a { color: #8a93a8; text-decoration: none; margin: 0 8px; }
+  .foot a:hover { color: #fff; }
+</style>
+</head>
+<body>
+
+<header class="top"><div class="in">
+  <a href="leads.html"><img src="assets/logo-white.png" alt="Tradie Ads"></a>
+  <div class="right"><span class="who" data-who></span><button type="button" class="out" data-signout hidden>Sign out</button></div>
+</div></header>
+
+<main class="stage"><div class="shell">
+
+  <div class="spin" data-view="loading"></div>
+
+  <div class="notice" data-view="offline" hidden>
+    <h1>Your leads dashboard is almost ready</h1>
+    <p>We're finishing the setup. Questions? Text <b>(650) 719-7145</b> or email <a href="mailto:admin@tradie-ads.com" style="color:var(--blue-hi)">admin@tradie-ads.com</a>.</p>
+  </div>
+
+  <!-- Sign in: email, then a 6-digit code -->
+  <section class="card signin" data-view="signin" hidden>
+    <form data-form="email" novalidate>
+      <h1>Sign in to your leads</h1>
+      <p class="lede">Enter the email you used in onboarding. We'll email you a 6-digit code. No password needed.</p>
+      <label class="f" for="s-email">Email</label>
+      <input class="in-field" id="s-email" name="email" type="email" autocomplete="email" placeholder="you@yourbusiness.com" required>
+      <button class="btn btn-primary" type="submit">Email me a code</button>
+      <p class="msg err" data-msg hidden></p>
+    </form>
+    <form data-form="code" novalidate hidden>
+      <h1>Check your email</h1>
+      <p class="lede">We sent a 6-digit code to <b data-sent-to></b>. It can take a minute to arrive, so check your spam folder too.</p>
+      <label class="f" for="s-code">Sign-in code</label>
+      <input class="in-field in-code" id="s-code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••" required>
+      <button class="btn btn-primary" type="submit">Sign in</button>
+      <p class="msg err" data-msg hidden></p>
+      <div class="row-between"><button type="button" class="link" data-change-email>Use a different email</button><button type="button" class="link" data-resend>Send a new code</button></div>
+      <p class="help">No code? Make sure it's the same email you gave us in onboarding, or text (650) 719-7145.</p>
+    </form>
+  </section>
+
+  <!-- Dashboard -->
+  <section data-view="dash" hidden>
+    <div class="card welcome" data-welcome hidden>
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+      <div>
+        <h2>You're all set<span data-first></span>!</h2>
+        <p>We're building your campaign now. On your strategy session we'll show you the ads and get your approval to go live. This is your leads dashboard: every lead shows up here the moment it comes in. Bookmark this page.</p>
+      </div>
+      <button type="button" class="x" data-dismiss aria-label="Close">×</button>
+    </div>
+
+    <div class="titlebar">
+      <div><h1>Your leads</h1><div class="biz" data-biz></div></div>
+      <span class="live off" data-live><span class="dot"></span><span data-live-text>Connecting…</span></span>
+    </div>
+
+    <div class="stats">
+      <div class="stat hi"><small>Today</small><b data-stat="today">0</b></div>
+      <div class="stat"><small>Last 7 days</small><b data-stat="week">0</b></div>
+      <div class="stat"><small>This month</small><b data-stat="month">0</b></div>
+      <div class="stat"><small>All time</small><b data-stat="all">0</b></div>
+    </div>
+
+    <div class="card sheet">
+      <div class="toolbar" data-toolbar hidden>
+        <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="search" placeholder="Search name, phone, email or answers" data-search aria-label="Search leads"></label>
+        <button type="button" class="tool" data-refresh><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.4-5.7L20 8.5"/><path d="M20 3.5v5h-5"/></svg>Refresh</button>
+        <button type="button" class="tool" data-csv><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Download CSV</button>
+      </div>
+      <div class="count" data-count hidden></div>
+      <div class="scroll" data-table-wrap hidden><table><thead data-thead></thead><tbody data-tbody></tbody></table></div>
+      <div class="blank" data-blank hidden>
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div>
+        <h3 data-blank-title>No leads yet</h3>
+        <p data-blank-text>Your dashboard is ready. As soon as your ads go live, every lead shows up here the moment it comes in, with their answers to your lead form.</p>
+      </div>
+    </div>
+  </section>
+
+</div></main>
+
+<footer class="foot">
+  <div>© <span data-yr>2026</span> 13541398 Canada Inc. o/a Tradie Ads. Questions? Text (650) 719-7145 or email <a href="mailto:admin@tradie-ads.com" style="margin:0">admin@tradie-ads.com</a></div>
+  <div style="margin-top:8px"><a href="privacy.html">Privacy</a>·<a href="terms.html">Terms</a></div>
+</footer>
+
+<script src="assets/dashboard-config.js"></script>
+<script>
+(function () {
+  "use strict";
+  var API = window.TA_LEADS_API || "";
+  var POLL_MS = 30000;
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  $("[data-yr]").textContent = new Date().getFullYear();
+
+  // ---------- storage (works without it, e.g. private windows) ----------
+  var mem = {};
+  function getItem(k) { try { return localStorage.getItem(k); } catch (e) { return mem[k] || null; } }
+  function setItem(k, v) { try { localStorage.setItem(k, v); } catch (e) { mem[k] = v; } }
+  function delItem(k) { try { localStorage.removeItem(k); } catch (e) {} delete mem[k]; }
+  var AUTH_KEY = "ta_leads_auth";
+  function auth() { try { return JSON.parse(getItem(AUTH_KEY) || "null"); } catch (e) { return null; } }
+
+  function api(action, data) {
+    var body = JSON.stringify(Object.assign({ action: action }, data || {}));
+    return fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: body, redirect: "follow" })
+      .then(function (r) { return r.json(); });
+  }
+
+  function view(name) { $$("[data-view]").forEach(function (v) { v.hidden = v.getAttribute("data-view") !== name; }); }
+
+  var q = new URLSearchParams(location.search);
+  if (q.get("welcome")) setItem("ta_leads_welcome", "1");
+
+  // ---------- sign in ----------
+  var fe = $('[data-form="email"]'), fc = $('[data-form="code"]');
+  var pendingEmail = "";
+  function msg(form, text) { var m = $("[data-msg]", form); m.textContent = text || ""; m.hidden = !text; }
+  var ERR = {
+    bad_email: "That email doesn't look right.",
+    wait: "We just sent a code. Give it a minute before asking for another.",
+    too_many: "Too many codes today. Email admin@tradie-ads.com and we'll sort it out.",
+    bad_code: "That code isn't right. Check the email and try again.",
+    expired: "That code has expired. Tap \"Send a new code\".",
+    no_access: "This email doesn't have access. Text (650) 719-7145 and we'll sort it out."
+  };
+  function errText(r) { return (r && ERR[r.error]) || "Something went wrong. Please try again."; }
+
+  function requestCode(email, form, btn) {
+    if (btn) btn.disabled = true;
+    return api("send_code", { email: email }).then(function (r) {
+      if (btn) btn.disabled = false;
+      if (!r.ok && r.error !== "wait") { msg(form, errText(r)); return; }
+      pendingEmail = email;
+      setItem("ta_leads_email", email);
+      $("[data-sent-to]").textContent = email;
+      fe.hidden = true; fc.hidden = false; msg(fc, r.ok ? "" : errText(r));
+      $("#s-code").value = ""; $("#s-code").focus();
+    }, function () { if (btn) btn.disabled = false; msg(form, errText()); });
+  }
+  fe.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var email = fe.elements.email.value.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msg(fe, ERR.bad_email); return; }
+    msg(fe, ""); requestCode(email, fe, $("button[type=submit]", fe));
+  });
+  fc.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var code = fc.elements.code.value.replace(/\D/g, ""), btn = $("button[type=submit]", fc);
+    if (code.length !== 6) { msg(fc, "Enter the 6-digit code from the email."); return; }
+    btn.disabled = true;
+    api("verify", { email: pendingEmail, code: code }).then(function (r) {
+      btn.disabled = false;
+      if (!r.ok) { msg(fc, errText(r)); return; }
+      setItem(AUTH_KEY, JSON.stringify({ token: r.token, email: r.email }));
+      history.replaceState(null, "", location.pathname);
+      startDash();
+    }, function () { btn.disabled = false; msg(fc, errText()); });
+  });
+  fc.elements.code.addEventListener("input", function () {
+    var v = fc.elements.code.value.replace(/\D/g, "").slice(0, 6);
+    fc.elements.code.value = v;
+    if (v.length === 6) fc.requestSubmit ? fc.requestSubmit() : fc.dispatchEvent(new Event("submit", { cancelable: true }));
+  });
+  $("[data-change-email]").addEventListener("click", function () { fc.hidden = true; fe.hidden = false; msg(fe, ""); fe.elements.email.focus(); });
+  $("[data-resend]").addEventListener("click", function () { msg(fc, ""); requestCode(pendingEmail, fc, $("[data-resend]")); });
+
+  function showSignin() {
+    stopPoll();
+    view("signin");
+    $("[data-signout]").hidden = true; $("[data-who]").textContent = "";
+    var email = (q.get("email") || getItem("ta_leads_email") || "").trim().toLowerCase();
+    fe.elements.email.value = email;
+    fe.hidden = false; fc.hidden = true;
+    // Coming straight from onboarding: send the code automatically, once per visit.
+    var autoKey = "ta_leads_autosent";
+    var already = false; try { already = sessionStorage.getItem(autoKey) === email; } catch (e) {}
+    if (q.get("send") && email && !already) {
+      try { sessionStorage.setItem(autoKey, email); } catch (e) {}
+      requestCode(email, fe, $("button[type=submit]", fe));
+    } else if (!email) fe.elements.email.focus();
+  }
+
+  $("[data-signout]").addEventListener("click", function () { delItem(AUTH_KEY); rows = []; known = null; openIds = {}; freshThisVisit = {}; showSignin(); });
+
+  // ---------- leads ----------
+  var META = { id: 1, ad_id: 1, ad_name: 1, adset_id: 1, adset_name: 1, campaign_id: 1, campaign_name: 1, form_id: 1, form_name: 1,
+    is_organic: 1, platform: 1, lead_status: 1, inbox_url: 1, retailer_item_id: 1, created_time: 1 };
+  var cols = null, rows = [], known = null, lastSeen = 0, freshThisVisit = {}, openIds = {}, timer = null, lastOk = 0, info = null;
+
+  function key(h) { return String(h || "").trim().toLowerCase().replace(/\s+/g, "_"); }
+  function nice(h) {
+    var s = String(h || "").replace(/_/g, " ").replace(/\s+/g, " ").trim();
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+  function niceVal(v) {
+    v = String(v == null ? "" : v).trim();
+    if (/^[a-z0-9]+(_[a-z0-9]+)+$/i.test(v)) v = v.replace(/_/g, " ");   // Meta stores some choices as snake_case
+    return v;
+  }
+  function phone(v) {
+    v = String(v || "").replace(/^p:/i, "").trim();
+    var d = v.replace(/\D/g, "");
+    if (d.length === 11 && d[0] === "1") d = d.slice(1);
+    return d.length === 10 ? "(" + d.slice(0, 3) + ") " + d.slice(3, 6) + "-" + d.slice(6) : v;
+  }
+  function findCol(keys, test) {
+    for (var i = 0; i < keys.length; i++) if (test(keys[i])) return i;
+    return -1;
+  }
+  function classify(headers) {
+    var k = headers.map(key);
+    var c = {
+      time: k.indexOf("created_time") > -1 ? k.indexOf("created_time") : findCol(k, function (x) { return /created|submitted|date|time/.test(x); }),
+      id: k.indexOf("id"),
+      name: findCol(k, function (x) { return x === "full_name" || x === "name"; }),
+      first: k.indexOf("first_name"), last: k.indexOf("last_name"),
+      phone: findCol(k, function (x) { return x === "phone_number" || x === "phone" || /phone|mobile/.test(x); }),
+      email: findCol(k, function (x) { return x === "email" || /e-?mail/.test(x); }),
+      platform: k.indexOf("platform"), ad: k.indexOf("ad_name"), form: k.indexOf("form_name"), campaign: k.indexOf("campaign_name"),
+      answers: []
+    };
+    var used = [c.time, c.id, c.name, c.first, c.last, c.phone, c.email];
+    k.forEach(function (x, i) { if (x && !META[x] && used.indexOf(i) < 0) c.answers.push(i); });
+    c.headers = headers;
+    return c;
+  }
+  function parseTime(v) {
+    if (!v) return 0;
+    var t = Date.parse(v);
+    if (isNaN(t)) t = Date.parse(String(v).replace(" ", "T"));
+    return isNaN(t) ? 0 : t;
+  }
+  function toLead(r, idx) {
+    var c = cols, g = function (i) { return i > -1 ? String(r[i] == null ? "" : r[i]).trim() : ""; };
+    var name = g(c.name) || [g(c.first), g(c.last)].filter(Boolean).join(" ");
+    return {
+      id: g(c.id) || r.join("\u0001"), t: parseTime(g(c.time)), rawTime: g(c.time), order: idx,
+      name: name, phone: phone(g(c.phone)), email: g(c.email),
+      answers: c.answers.map(function (i) { return niceVal(r[i]); }),
+      platform: g(c.platform), ad: g(c.ad), form: g(c.form), campaign: g(c.campaign)
+    };
+  }
+
+  var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function clock(d) { var h = d.getHours(), m = ("0" + d.getMinutes()).slice(-2); return (h % 12 || 12) + ":" + m + (h < 12 ? " AM" : " PM"); }
+  function dayStart(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); }
+  function when(t) {
+    if (!t) return { top: "", sub: "" };
+    var d = new Date(t), now = Date.now(), diff = Math.max(0, now - t), today = dayStart(new Date());
+    var rel = diff < 60e3 ? "Just now" : diff < 3600e3 ? Math.floor(diff / 60e3) + " min ago" : diff < 6 * 3600e3 ? Math.floor(diff / 3600e3) + " hr ago" : "";
+    var day = t >= today ? "Today" : t >= today - 864e5 ? "Yesterday" : MON[d.getMonth()] + " " + d.getDate() + (d.getFullYear() !== new Date().getFullYear() ? ", " + d.getFullYear() : "");
+    return { top: rel || day, sub: (rel ? day + " " : "") + clock(d) };
+  }
+
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function cellText(td, v) { if (v) td.textContent = v; else td.appendChild(el("span", "empty", "—")); }
+
+  var search = $("[data-search]");
+  search.addEventListener("input", function () { render(); });
+
+  function render() {
+    var tb = $("[data-tbody]"), th = $("[data-thead]");
+    var term = search.value.trim().toLowerCase();
+    var list = rows.filter(function (L) {
+      if (!term) return true;
+      return [L.name, L.phone, L.email, L.phone.replace(/\D/g, "")].concat(L.answers).join(" ").toLowerCase().indexOf(term) > -1;
+    });
+
+    // header
+    th.innerHTML = "";
+    var hr = el("tr");
+    ["Received", "Name", "Phone", "Email"].concat(cols.answers.map(function (i) { return nice(cols.headers[i]); }))
+      .forEach(function (h, i) { var c = el("th", null, h); hr.appendChild(c); });
+    th.appendChild(hr);
+
+    tb.innerHTML = "";
+    list.forEach(function (L) {
+      var tr = el("tr", "lead"), w = when(L.t);
+      var isNew = L.t ? L.t > lastSeen : false;
+      if (isNew || freshThisVisit[L.id]) tr.classList.add("is-new");
+      if (freshThisVisit[L.id] === 1) { tr.classList.add("flash"); freshThisVisit[L.id] = 2; }
+      var tdW = el("td", "when"); tdW.setAttribute("data-label", "Received");
+      if (L.t) { tdW.appendChild(el("b", null, w.top)); tdW.appendChild(document.createTextNode(w.sub)); tdW.title = new Date(L.t).toString(); }
+      else cellText(tdW, L.rawTime);
+      var tdN = el("td", "name"); cellText(tdN, L.name);
+      if (isNew || freshThisVisit[L.id]) tdN.appendChild(el("span", "badge", "New"));
+      var tdP = el("td", "phone"); cellText(tdP, L.phone);
+      var tdE = el("td", "email"); cellText(tdE, L.email);
+      [tdW, tdN, tdP, tdE].forEach(function (c) { tr.appendChild(c); });
+      L.answers.forEach(function (a) { var c = el("td", "ans"); cellText(c, a); tr.appendChild(c); });
+      tr.addEventListener("click", function (ev) {
+        if (window.getSelection && String(window.getSelection())) return;   // let people select text to copy
+        var next = tr.nextElementSibling;
+        if (next && next.classList.contains("detail")) { next.remove(); delete openIds[L.id]; return; }
+        openIds[L.id] = 1;
+        tr.after(detailRow(L, 4 + L.answers.length));
+      });
+      tb.appendChild(tr);
+      if (openIds[L.id]) tb.appendChild(detailRow(L, 4 + L.answers.length));
+    });
+
+    var total = rows.length;
+    $("[data-count]").textContent = term ? list.length + " of " + total + " leads match \"" + search.value.trim() + "\"" : total + (total === 1 ? " lead" : " leads") + " · tap a lead to see all their answers";
+  }
+
+  function detailRow(L, span) {
+    var tr = el("tr", "detail"), td = el("td"); td.colSpan = span;
+    var grid = el("div", "qa");
+    function item(label, val) { if (!val) return; var d = el("div"); d.appendChild(el("small", null, label)); d.appendChild(el("span", null, val)); grid.appendChild(d); }
+    cols.answers.forEach(function (i, j) { item(nice(cols.headers[i]), L.answers[j]); });
+    if (!grid.children.length) grid.appendChild(el("div", null, "No other answers on this lead form."));
+    td.appendChild(grid);
+    var src = [L.platform ? (/^ig$|insta/i.test(L.platform) ? "Instagram" : /^fb$|face/i.test(L.platform) ? "Facebook" : L.platform) : "", L.form ? "Form: " + L.form : "", L.ad ? "Ad: " + L.ad : ""].filter(Boolean);
+    if (L.t) src.unshift(new Date(L.t).toLocaleString());
+    if (src.length) td.appendChild(el("div", "src", src.join("  ·  ")));
+    tr.appendChild(td);
+    return tr;
+  }
+
+  function stats() {
+    var now = new Date(), today = dayStart(now), week = Date.now() - 7 * 864e5, month = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    var n = { today: 0, week: 0, month: 0, all: rows.length };
+    rows.forEach(function (L) { if (!L.t) return; if (L.t >= today) n.today++; if (L.t >= week) n.week++; if (L.t >= month) n.month++; });
+    Object.keys(n).forEach(function (k) { $('[data-stat="' + k + '"]').textContent = n[k]; });
+  }
+
+  function setLive(ok) {
+    var lv = $("[data-live]");
+    lv.classList.toggle("off", !ok);
+    if (ok) lastOk = Date.now();
+    tickLive();
+  }
+  function tickLive() {
+    var s = lastOk ? Math.round((Date.now() - lastOk) / 1000) : -1;
+    $("[data-live-text]").textContent = s < 0 ? "Connecting…" : (s < 10 ? "Live · updated just now" : s < 60 ? "Live · updated " + s + "s ago" : "Live · updated " + Math.floor(s / 60) + " min ago");
+  }
+  setInterval(tickLive, 5000);
+
+  var newCount = 0;
+  function titleBadge() { document.title = (newCount ? "(" + newCount + ") " : "") + "Your Leads · Tradie Ads"; }
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) { newCount = 0; titleBadge(); if (auth()) load(); }
+  });
+
+  function load() {
+    var a = auth();
+    if (!a) { showSignin(); return Promise.resolve(); }
+    return api("leads", { token: a.token }).then(function (r) {
+      if (!r.ok) { if (r.error === "signed_out") { delItem(AUTH_KEY); showSignin(); } else setLive(false); return; }
+      info = r;
+      view("dash");
+      $("[data-signout]").hidden = false;
+      $("[data-who]").textContent = r.business || r.email;
+      $("[data-biz]").textContent = r.business ? r.business + " · " + r.email : r.email;
+      var first = (r.name || "").split(/\s+/)[0];
+      $("[data-first]").textContent = first ? ", " + first : "";
+      $("[data-welcome]").hidden = getItem("ta_leads_welcome") !== "1";
+      setLive(true);
+
+      var headers = r.headers || [], data = r.rows || [];
+      var has = r.status === "live" && headers.length && data.length;
+      $("[data-toolbar]").hidden = !has; $("[data-count]").hidden = !has; $("[data-table-wrap]").hidden = !has; $("[data-blank]").hidden = !!has;
+      if (!has) {
+        rows = []; stats();
+        $("[data-blank-title]").textContent = "No leads yet";
+        return;
+      }
+      cols = classify(headers);
+      var next = data.map(toLead);
+      next.sort(function (x, y) { return (y.t - x.t) || (y.order - x.order); });
+
+      var seenKey = "ta_leads_seen:" + r.email;
+      if (known === null) {
+        // First load this visit: anything newer than last visit gets a "New" badge.
+        var stored = getItem(seenKey);
+        lastSeen = stored === null ? Infinity : Number(stored) || 0;   // first ever visit: no badges
+        known = {};
+        next.forEach(function (L) { known[L.id] = 1; });
+      } else {
+        next.forEach(function (L) {
+          if (!known[L.id]) { known[L.id] = 1; freshThisVisit[L.id] = 1; if (document.hidden) newCount++; }
+        });
+        titleBadge();
+      }
+      var newest = next.reduce(function (m, L) { return Math.max(m, L.t || 0); }, 0);
+      if (newest) setItem(seenKey, String(newest));
+      rows = next;
+      stats(); render();
+    }, function () { setLive(false); });
+  }
+
+  function stopPoll() { if (timer) clearInterval(timer); timer = null; }
+  function startDash() {
+    view("loading");
+    load().then(function () {
+      stopPoll();
+      timer = setInterval(function () { if (!document.hidden && auth()) load(); }, POLL_MS);
+    });
+  }
+
+  $("[data-refresh]").addEventListener("click", function () { load(); });
+  $("[data-dismiss]").addEventListener("click", function () { delItem("ta_leads_welcome"); $("[data-welcome]").hidden = true; });
+
+  $("[data-csv]").addEventListener("click", function () {
+    if (!rows.length) return;
+    var head = ["Received", "Name", "Phone", "Email"].concat(cols.answers.map(function (i) { return nice(cols.headers[i]); }));
+    var esc = function (v) { v = String(v == null ? "" : v); if (/^[=+\-@]/.test(v)) v = "'" + v; return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    var lines = [head.map(esc).join(",")].concat(rows.map(function (L) {
+      return [L.t ? new Date(L.t).toLocaleString() : L.rawTime, L.name, L.phone, L.email].concat(L.answers).map(esc).join(",");
+    }));
+    var blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = "tradie-ads-leads-" + new Date().toISOString().slice(0, 10) + ".csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+  });
+
+  // ---------- start ----------
+  if (!API) { view("offline"); return; }
+  if (auth()) startDash(); else showSignin();
+})();
+</script>
+</body>
+</html>
