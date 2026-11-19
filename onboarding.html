@@ -142,6 +142,18 @@
   .list b { color: var(--ink); }
   .copy { display: inline-flex; align-items: center; gap: 8px; background: #f4f7fe; border: 1px solid #dbe5fb; border-radius: 8px; padding: 4px 6px 4px 10px; font: 600 15px ui-monospace, Menlo, monospace; color: var(--ink); }
   .copy button { border: 0; background: var(--blue); color: #fff; border-radius: 6px; font: 600 12px Inter, sans-serif; padding: 5px 8px; cursor: pointer; }
+  .btn-outline { background: #fff; color: var(--ink); border: 1.5px solid var(--field); }
+  .btn-outline:hover { border-color: var(--blue); color: var(--blue); }
+  .fb-how { text-align: center; font-size: 15px; color: var(--muted); margin: 14px 0 16px; line-height: 1.55; }
+  .fb-how b { color: var(--ink); }
+  .bm-box { border: 1px solid var(--edge); background: #f7f9fe; border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+  .bm-title { font-weight: 700; font-size: 16px; color: var(--ink); }
+  .bm-sub { font-size: 13px; color: var(--muted); margin: 4px 0 10px; }
+  .bm-row { display: flex; gap: 8px; }
+  .bm-row input { flex: 1; min-width: 0; height: 44px; border: 1px solid var(--field); border-radius: 10px; background: #fff; padding: 0 12px; font: 600 16px ui-monospace, Menlo, monospace; color: var(--ink); letter-spacing: .03em; }
+  .bm-copy { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--blue); color: #fff; font: 600 14px Inter, sans-serif; cursor: pointer; flex: none; }
+  .bm-copy svg { width: 16px; height: 16px; }
+  .bm-copy.done { background: var(--ok); }
   .manual { margin-top: 14px; border-top: 1px solid var(--edge); padding-top: 14px; }
   .manual h3 { font-size: 17px; color: var(--ink); }
 
@@ -194,6 +206,14 @@
   .foot a { color: #8a93a8; text-decoration: none; margin: 0 8px; }
   .foot a:hover { color: #fff; }
 
+  .modal { position: fixed; inset: 0; z-index: 20; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(7,11,20,.74); }
+  .modal-box { background: #fff; width: 100%; max-width: 420px; border-radius: 18px; padding: 28px 22px 22px; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.45); display: flex; flex-direction: column; gap: 12px; }
+  .modal-tick { width: 54px; height: 54px; margin: 0 auto 2px; border-radius: 50%; background: #ecfdf3; color: var(--ok); font: 800 28px/54px Inter, sans-serif; }
+  .modal-box h2 { font-size: 24px; color: var(--ink); }
+  .modal-box p { color: var(--muted); font-size: 15px; margin-bottom: 6px; }
+  .pdf-doc.agree-doc { width: 720px; max-height: none; overflow: visible; border: 0; border-radius: 0; padding: 0; margin: 0; background: #fff; color: #111; font-size: 13px; }
+  .pdf-doc [data-f].filled { background: none; padding: 0; }
+  .pdf-doc .audit { margin-top: 18px; padding-top: 8px; border-top: 1px solid #ccc; color: #555; font-size: 10.5px; }
   .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px; z-index: 9; }
 </style>
 </head>
@@ -265,9 +285,9 @@
           <div class="actions"><button class="btn btn-primary btn-block" type="submit">Submit signature</button></div>
         </form>
         <div class="signed" data-signed hidden>
-          <p class="big">✓ Signed! The contract has been emailed to you directly.</p>
-          <p>Signed by <b data-signed-name></b> on <span data-signed-date></span>. Check <b data-signed-email></b> for your copy (and your spam folder, just in case).</p>
-          <div style="margin-top:10px"><button type="button" class="btn btn-ghost" data-print style="min-height:42px">Save a PDF copy</button></div></div>
+          <p class="big">✓ Signed!</p>
+          <p>Signed by <b data-signed-name></b> on <span data-signed-date></span>. Download your signed copy and keep it for your records.</p>
+          <div style="margin-top:10px"><button type="button" class="btn btn-primary" data-download style="min-height:44px">Download Your Signed Copy</button></div></div>
       </div>
       <div class="cta" data-after-sign hidden><button class="btn btn-glow" data-next>Continue to Step 3 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     </section>
@@ -340,24 +360,20 @@
       <div class="head"><h1>Step 5: Connect your Facebook account</h1><p>Watch the video, then connect your Facebook Page and the ad account that has your credit card on it. Your ad spend is charged to that card.</p></div>
       <div class="video" data-video="facebook"></div>
       <div class="card">
-        <div class="actions" style="margin-top:0">
-          <a class="btn btn-primary btn-block" data-fb-connect href="#" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V5.5h-3c-2.5 0-4 1.6-4 4V11H8v3.5h2V22h3.5v-7.5H16l.5-3.5h-3V9.6c0-.4.2-.6.5-.6z"/></svg>Connect your Facebook account</a>
-          <button class="btn btn-warn btn-block" type="button" data-toggle-manual>Not working? Click here</button>
-        </div>
-        <p class="fine">Takes about 2 minutes. Done through Meta Business Settings. You never share your password.</p>
+        <a class="btn btn-outline btn-block" href="https://business.facebook.com/settings/partners" target="_blank" rel="noopener">Open Business Settings <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
+        <p class="fb-how">Pick your business, then go to <b>Partners</b> in the left sidebar, click <b>Add</b>, choose <b>"Give a partner access to your assets"</b> and grant access to your <b>Page</b> (Full control) and <b>Ad Account</b> (Manage ad account).</p>
 
-        <div class="manual" data-manual hidden>
-          <h3>Give Tradie Ads partner access</h3>
-          <ol class="list">
-            <li><span class="n">1</span><span>Go to <a href="https://business.facebook.com/settings/partners" target="_blank" rel="noopener">Meta Business Settings → Partners</a> and log in.</span></li>
-            <li><span class="n">2</span><span>Click <b>Add</b> → <b>Give a partner access to your assets</b>.</span></li>
-            <li><span class="n">3</span><span>Enter our Business ID: <span class="copy" data-bmid-wrap><span data-bmid></span><button type="button" data-copy-bmid>Copy</button></span></span></li>
-            <li><span class="n">4</span><span>Under <b>Pages</b>, select your business Page and turn on <b>Full control</b> (needed to run ads and access leads).</span></li>
-            <li><span class="n">5</span><span>Under <b>Ad accounts</b>, select your ad account and turn on <b>Manage ad account</b>. Then click <b>Save</b>.</span></li>
-          </ol>
-          <p class="help"><b>Ad account disabled, or Page deleted?</b> It happens. Tick the box below and email <a href="mailto:admin@tradie-ads.com">admin@tradie-ads.com</a> with what you see. We'll walk you through setting up a new one before launch.</p>
-          <p class="help">No Business Manager or ad account yet? Same thing: tick the box and we'll set it up with you on your strategy session.</p>
+        <div class="bm-box">
+          <div class="bm-title">Add Tradie Ads as a partner</div>
+          <div class="bm-sub">Tradie Ads Business Manager ID: paste this into the Add Partner dialog</div>
+          <div class="bm-row" data-bmid-wrap>
+            <input type="text" readonly data-bmid aria-label="Tradie Ads Business Manager ID">
+            <button type="button" class="bm-copy" data-copy-bmid><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></svg><span>Copy</span></button>
+          </div>
         </div>
+
+        <p class="help"><b>Ad account disabled, or Page deleted?</b> It happens. Tick the box below and email <a href="mailto:admin@tradie-ads.com">admin@tradie-ads.com</a> with what you see. We'll walk you through setting up a new one before launch.</p>
+        <p class="help">No Business Manager or ad account yet? Same thing: tick the box and we'll set it up with you on your strategy session.</p>
 
         <label class="check"><input type="checkbox" data-gate="facebook"> I've connected my account or sent the partner access.</label>
       </div>
@@ -552,6 +568,16 @@
 </div>
 </template>
 
+<div class="modal" data-signed-modal role="dialog" aria-modal="true" aria-labelledby="sm-title" hidden>
+  <div class="modal-box">
+    <div class="modal-tick" aria-hidden="true">✓</div>
+    <h2 id="sm-title">Agreement signed</h2>
+    <p>Thanks<span data-sm-name></span>. Download your signed copy now and keep it for your records.</p>
+    <button type="button" class="btn btn-glow btn-block" data-download>Download Your Signed Copy</button>
+    <button type="button" class="btn btn-ghost btn-block" data-modal-next>Continue to Step 3</button>
+  </div>
+</div>
+
 <footer class="foot">
   <img src="assets/logo-white.png" alt="Tradie Ads">
   <div>© <span data-yr>2026</span> 13541398 Canada Inc. o/a Tradie Ads. All rights reserved.</div>
@@ -564,12 +590,13 @@ var CONFIG = {
   // GHL Automation → Workflow → trigger "Inbound Webhook" → copy its URL here.
   // Every step POSTs the client's answers to it (see ghl/onboarding.md).
   webhookUrl: "https://services.leadconnectorhq.com/hooks/jJvHsMLBbpWBdBy4BZMK/webhook-trigger/9306bf87-6450-410d-a49f-fd91edb8b3c5",
+  // Google Apps Script web app (apps-script/Code.gs, outside this repo). Gets the same events and sends the Slack
+  // alerts + the client's signed-agreement email. Blank = off.
+  notifyUrl: "",
   // Version label saved with each signature. Bump it whenever the agreement text in <template id="agreement-text"> changes.
   agreementVersion: "2026-11-18",
   // Section 5 minimum service-area radius (miles). Blank = the line shows "______".
   minRadiusMiles: "15",
-  // One-click Facebook connect link, if you use a tool for it. Blank = button opens the manual steps.
-  fbConnectUrl: "",
   // Tradie Ads' Meta Business Manager ID (Business Settings → Business info).
   businessId: "160308512414464",
   // GHL calendar for the onboarding call.
@@ -625,8 +652,9 @@ var CONFIG = {
     body.set("sheet_url", d.sheet || "");
     Object.keys(extra || {}).forEach(function (k) { body.set(k, extra[k]); });
     body.set("page", location.href.split("?")[0]); body.set("submitted_at", new Date().toISOString());
-    if (!CONFIG.webhookUrl) { console.warn("[onboarding] webhookUrl not set:", Object.fromEntries(body)); return; }
-    try { fetch(CONFIG.webhookUrl, { method: "POST", mode: "no-cors", body: body, keepalive: true }); } catch (e) {}
+    var urls = [CONFIG.webhookUrl, CONFIG.notifyUrl].filter(Boolean);
+    if (!urls.length) { console.warn("[onboarding] no webhook set:", Object.fromEntries(body)); return; }
+    urls.forEach(function (u) { try { fetch(u, { method: "POST", mode: "no-cors", body: body, keepalive: true }); } catch (e) {} });
   }
 
   // Progress bars
@@ -805,18 +833,61 @@ var CONFIG = {
     el.addEventListener("change", function () { state.agreement[k] = el.value.trim(); save(); fillDoc(); });
   });
   fsig.elements.signature.addEventListener("input", fillDoc);
-  $("[data-print]").addEventListener("click", function () {
-    var w = window.open("", "_blank"); if (!w) return;
-    var css = 'body{font:14px/1.6 Arial,Helvetica,sans-serif;color:#111;max-width:760px;margin:30px auto;padding:0 20px}h2{text-align:center;font-size:22px}h3{font-size:16px;margin:18px 0 6px}img{display:block;width:170px;margin:0 auto 12px}table{width:100%;border-collapse:collapse;margin:8px 0}th,td{border:1px solid #999;padding:5px 7px;text-align:left;vertical-align:top}th{background:#eee}.script{font:600 30px "Dancing Script","Snell Roundhand","Segoe Script",cursive;color:#1e3a8a}.blank{color:#999}';
-    w.document.write('<!doctype html><html><head><meta charset="utf-8"><base href="' + location.href.split("?")[0].replace(/[^/]*$/, "") + '"><title>Tradie Ads Agreement - ' + (state.agreement.legal_name || "") + '</title><link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet"><style>' + css + '</style></head><body>' + doc.innerHTML + '</body></html>');
+  function pdfName() { return "Tradie Ads Agreement - " + (state.agreement.legal_name || state.data.business || "Signed").replace(/[\\\/:*?"<>|]/g, "") + ".pdf"; }
+  function auditLine() {
+    var g = state.signature; if (!g) return "";
+    var esc = function (x) { var d = document.createElement("div"); d.textContent = x || ""; return d.innerHTML; };
+    return '<p class="audit">Signed electronically by ' + esc(g.name) + " (" + esc(state.data.email) + ") on " +
+      esc(new Date(g.at).toLocaleString("en-US", { dateStyle: "long", timeStyle: "short" })) +
+      " at tradie-ads.com/onboarding. Agreement version " + esc(g.version) + ".</p>";
+  }
+  // Fallback if the PDF library can't load: open the print view so they can "Save as PDF".
+  function printCopy() {
+    var w = window.open("", "_blank"); if (!w) { toast("Allow pop-ups to save your copy"); return; }
+    var css = 'body{font:14px/1.6 Arial,Helvetica,sans-serif;color:#111;max-width:760px;margin:30px auto;padding:0 20px}h2{text-align:center;font-size:22px}h3{font-size:16px;margin:18px 0 6px}img{display:block;width:170px;margin:0 auto 12px}table{width:100%;border-collapse:collapse;margin:8px 0}th,td{border:1px solid #999;padding:5px 7px;text-align:left;vertical-align:top}th{background:#eee}.script{font:600 30px "Dancing Script","Snell Roundhand","Segoe Script",cursive;color:#1e3a8a}.blank{color:#999}.audit{margin-top:18px;padding-top:8px;border-top:1px solid #ccc;color:#555;font-size:11px}';
+    w.document.write('<!doctype html><html><head><meta charset="utf-8"><base href="' + location.href.split("?")[0].replace(/[^/]*$/, "") + '"><title>' + pdfName().replace(/\.pdf$/, "") + '</title><link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&display=swap" rel="stylesheet"><style>' + css + '</style></head><body>' + doc.innerHTML + auditLine() + '</body></html>');
     w.document.close(); w.focus(); setTimeout(function () { w.print(); }, 400);
-  });
+  }
+  var H2P = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+  function loadH2P(cb) {
+    if (window.html2pdf) return cb();
+    var sc = document.createElement("script"); sc.src = H2P;
+    sc.onload = function () { cb(); }; sc.onerror = function () { cb(new Error("load failed")); };
+    document.head.appendChild(sc);
+  }
+  function downloadCopy(btn) {
+    if (btn.disabled) return;
+    var label = btn.textContent; btn.disabled = true; btn.textContent = "Preparing your PDF…";
+    var done = function () { btn.disabled = false; btn.textContent = label; };
+    loadH2P(function (err) {
+      if (err || !window.html2pdf) { done(); printCopy(); return; }
+      var box = document.createElement("div");
+      box.className = "agree-doc pdf-doc";
+      box.innerHTML = doc.innerHTML + auditLine();
+      window.html2pdf().set({
+        margin: [12, 12, 14, 12], filename: pdfName(),
+        image: { type: "jpeg", quality: 0.96 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff", scrollX: 0, scrollY: 0 },
+        jsPDF: { unit: "mm", format: "letter", orientation: "portrait" },
+        pagebreak: { mode: ["css", "legacy"], avoid: ["tr", ".sigs", "h3"] }
+      }).from(box).save().then(function () { done(); toast("Signed copy downloaded"); }, function () { done(); printCopy(); });
+    });
+  }
+  $$("[data-download]").forEach(function (b) { b.addEventListener("click", function () { downloadCopy(b); }); });
+  var modal = $("[data-signed-modal]");
+  function closeModal() { modal.hidden = true; }
+  function openModal() {
+    $("[data-sm-name]").textContent = state.signature ? ", " + state.signature.name.split(/\s+/)[0] : "";
+    modal.hidden = false; $("[data-download]", modal).focus();
+  }
+  $("[data-modal-next]").addEventListener("click", function () { closeModal(); advance(); });
+  modal.addEventListener("click", function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !modal.hidden) closeModal(); });
   function showSigned() {
     var g = state.signature; if (!g) return;
     fsig.hidden = true; $("[data-signed]").hidden = false; ab.hidden = false;
     $("[data-signed-name]").textContent = g.name;
     $("[data-signed-date]").textContent = new Date(g.at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
-    $("[data-signed-email]").textContent = state.data.email || "your email";
     fillDoc();
   }
   ab.hidden = !state.signature;
@@ -832,26 +903,31 @@ var CONFIG = {
     state.signature = { name: name, at: new Date().toISOString(), version: CONFIG.agreementVersion };
     save();
     var a = state.agreement;
-    send("agreement_signed", { signature_name: name, signer_title: a.title, signed_at: state.signature.at, agreement_version: CONFIG.agreementVersion,
+    send("agreement_signed", { signature_name: name, signer_title: a.title, signed_at: state.signature.at, signed_date: today(), agreement_version: CONFIG.agreementVersion,
       legal_name: a.legal_name, entity_type: a.entity_type, state: a.state, business_address: a.address, service_area: a.service_area,
       min_radius_miles: CONFIG.minRadiusMiles, user_agent: navigator.userAgent });
     showSigned();
     $("[data-signed]").scrollIntoView({ behavior: "smooth", block: "center" });
+    openModal();
   });
   fillDoc();
   showSigned();
 
   // Facebook
-  var fb = $("[data-fb-connect]"), manual = $("[data-manual]");
-  if (CONFIG.fbConnectUrl) fb.href = CONFIG.fbConnectUrl;
-  else { fb.parentNode.hidden = true; manual.hidden = false; manual.style.borderTop = "0"; }
-  $("[data-toggle-manual]").addEventListener("click", function () { manual.hidden = !manual.hidden; });
-  if (CONFIG.businessId) $("[data-bmid]").textContent = CONFIG.businessId;
-  else $("[data-bmid-wrap]").outerHTML = "<b>we'll text it to you</b>";
+  var bmInput = $("[data-bmid]");
+  if (CONFIG.businessId) bmInput.value = CONFIG.businessId;
+  else $("[data-bmid-wrap]").outerHTML = "<b>We'll text it to you.</b>";
   var cpy = $("[data-copy-bmid]");
   if (cpy) cpy.addEventListener("click", function () {
-    try { navigator.clipboard.writeText(CONFIG.businessId); toast("Business ID copied"); } catch (e) {}
+    var label = cpy.querySelector("span");
+    function copied() {
+      cpy.classList.add("done"); label.textContent = "Copied";
+      setTimeout(function () { cpy.classList.remove("done"); label.textContent = "Copy"; }, 2500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(CONFIG.businessId).then(copied, function () { bmInput.select(); document.execCommand("copy"); copied(); });
+    else { bmInput.select(); try { document.execCommand("copy"); } catch (e) {} copied(); }
   });
+  bmInput.addEventListener("focus", function () { bmInput.select(); });
 
   // Multi-value fields (Step 4)
   function addRow(box, val) {
