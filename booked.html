@@ -51,15 +51,25 @@
   .video-cap { text-align: center; color: var(--muted); font-size: 14px; margin-top: 10px; }
 
   /* Steps */
-  .steps-head { margin: 48px 0 18px; }
+  .steps-card { background: var(--card); border: 1px solid var(--edge); border-radius: 18px; margin: 48px 0 0; overflow: hidden; box-shadow: 0 10px 30px rgba(10,15,30,.06); }
+  @media (min-width: 900px) { .steps-card { width: min(1080px, calc(100vw - 32px)); margin-left: 50%; transform: translateX(-50%); } }
+  .steps-head { padding: 24px 20px 18px; text-align: center; border-bottom: 1px solid var(--edge); }
   .steps-head h2 { font-size: clamp(24px, 5vw, 32px); font-weight: 900; }
   .steps-head p { color: var(--muted); margin-top: 6px; }
-  .steps { list-style: none; display: grid; gap: 14px; }
-  .step { background: var(--card); border: 1px solid var(--edge); border-radius: 14px; padding: 20px; display: grid; grid-template-columns: 44px 1fr; gap: 16px; }
+  .steps { list-style: none; display: grid; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .steps { grid-template-columns: repeat(3, 1fr); } }
+  .step { padding: 22px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .step + .step { border-top: 1px solid var(--edge); }
+  @media (min-width: 900px) { .step + .step { border-top: 0; border-left: 1px solid var(--edge); } }
+  .step > div:last-child { display: flex; flex-direction: column; flex: 1; }
+  .step h3 { font-size: 19px; font-weight: 800; margin: 0 0 6px; line-height: 1.25; }
+  .step p { color: var(--muted); font-size: 15.5px; }
+  .step .actions { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 16px; }
+  .step .actions .btn { width: 100%; }
+  .step .actions[hidden] { display: none; }
+  .step.urgent { background: var(--alert-bg); }
+  .step.urgent .num { background: var(--alert); }
   .num { width: 44px; height: 44px; border-radius: 12px; background: var(--blue); color: #fff; display: grid; place-items: center; font: 900 20px/1 Archivo, sans-serif; }
-  .step h3 { font-size: 20px; font-weight: 800; margin: 2px 0 6px; }
-  .step p { color: var(--muted); font-size: 16px; }
-  .step .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 18px; border-radius: 10px; font: 700 16px/1 Inter, sans-serif; text-decoration: none; border: 0; cursor: pointer; }
   .btn-primary { background: var(--blue); color: #fff; }
   .btn-primary:hover { background: #1a50db; }
@@ -67,8 +77,6 @@
   .btn-ghost:hover { background: #e2e8f6; }
   .btn svg { width: 18px; height: 18px; flex: none; }
   .hint { font-size: 14px; color: var(--muted); margin-top: 10px; }
-  .step.urgent { border-color: rgba(229,72,77,.5); background: var(--alert-bg); }
-  .step.urgent .num { background: var(--alert); }
 
   /* Read section */
   .read { background: var(--card); border: 1px solid var(--edge); border-radius: 16px; padding: 28px 20px; margin: 48px 0 0; }
@@ -136,6 +144,7 @@
   </div>
   <p class="video-cap">A quick message from Ethan about what happens on your call.</p>
 
+  <section class="steps-card">
   <div class="steps-head">
     <h2>Do these 3 things before your call</h2>
     <p>Your time slot is held for you, but it isn't locked in until step 1 is done.</p>
@@ -190,6 +199,7 @@
       </div>
     </li>
   </ol>
+  </section>
 
   <!-- ===== Step 2 reading ===== -->
   <article class="read" id="read">
