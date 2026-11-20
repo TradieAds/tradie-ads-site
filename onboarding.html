@@ -106,6 +106,8 @@
   input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(31,94,255,.15); }
   input.bad { border-color: var(--alert); }
   .help { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .plan-note { font-size: 14px; color: var(--text); background: #eef3ff; border: 1px solid #cddbff; border-radius: 10px; padding: 10px 12px; margin: 0 0 12px; }
+  .plan-note.bad-note { background: #fdeeee; border-color: #f3c2c3; color: #7a1f22; }
   .err { font-size: 13px; color: var(--alert); margin-top: 6px; }
   .multi { display: grid; gap: 8px; }
   .row-x { display: flex; gap: 8px; }
@@ -275,6 +277,7 @@
 
         <form data-form="sign" novalidate>
           <p class="form-title">Fill in the blanks</p>
+          <p class="plan-note" data-plan-note></p>
           <p class="help" style="margin-top:0">These complete Section 1 of the agreement. You'll see them appear above as you type.</p>
           <div class="grid-f">
             <div class="full"><label class="f" for="a-legal">Legal business name<span class="req">*</span></label><input id="a-legal" name="legal_name" type="text" autocomplete="organization"></div>
@@ -394,8 +397,8 @@
      Then bump CONFIG.agreementVersion (e.g. "2026-11-v1") so every signature records which version was signed. -->
 <template id="agreement-text">
 <img class="doc-logo" src="assets/logo-dark.png" alt="Tradie Ads">
-<h2>Client Services Agreement &amp; 30-Lead Guarantee</h2>
-<p>This Client Services Agreement (the "Agreement") is entered into on the Effective Date below between the Provider and the Client named here. The Provider will run paid advertising for the Client's electrical services business and guarantees 30 Exclusive Qualified Leads in the first 30 days of ads launching, or the Client gets the Service Fee back.</p>
+<h2>Client Services Agreement &amp; Positive-ROI Guarantee</h2>
+<p>This Client Services Agreement (the "Agreement") is entered into on the Effective Date below between the Provider and the Client named here. The Provider will run paid advertising for the Client's electrical services business and guarantees a positive return: if the jobs the Client sells to the Provider's leads don't add up to more than the Client's Total Spend, the Client gets the Service Fee back.</p>
 
 <h3>1. Parties</h3>
 <p>This Agreement is made on <span data-f="date"></span> (the <b>"Effective Date"</b>) between:</p>
@@ -410,37 +413,44 @@
 <ul>
 <li>Ad strategy, targeting and audience setup on Meta (Facebook and Instagram) and any other platform agreed in writing</li>
 <li>Ad copy and creative (images and/or video)</li>
-<li>A lead capture form or landing page that collects every Qualified Lead field in Section 4</li>
-<li>Real-time lead delivery to the Client by email, SMS or CRM</li>
-<li>Ongoing campaign monitoring and optimization during the Guarantee Period</li>
+<li>A lead capture form or landing page that collects the details listed in Section 4</li>
+<li>Real-time lead delivery to the Client by email, SMS or CRM, and a leads dashboard where the Client sees every lead and records its outcome</li>
+<li>Ongoing campaign monitoring and optimization during the Term</li>
 </ul>
 <p>The Provider does not contact, qualify by phone, quote, sell to or install for any lead. Following up and closing jobs is the Client's responsibility.</p>
 
-<h3>3. Fees and Ad Spend</h3>
-<p>All amounts are in <b>US dollars (USD)</b>.</p>
+<h3>3. Package, Fees and Ad Spend</h3>
+<p>All amounts are in <b>US dollars (USD)</b>. The package below is the one agreed with the Client before signing.</p>
 <table>
-<tr><th>Item</th><th>Amount</th><th>When due</th></tr>
-<tr><td>Monthly Service Fee</td><td>$1,000 USD / month</td><td>First month before work begins, then in advance each month</td></tr>
-<tr><td>Ad spend (minimum)</td><td>$2,000 USD / month</td><td>Paid by the Client directly to the ad platform</td></tr>
-<tr><td>Additional services (optional)</td><td>Quoted per month</td><td>Added only by written agreement</td></tr>
+<tr><th>Item</th><th>Amount</th><th>How it's paid</th></tr>
+<tr><td>Service Fee</td><td>$<span data-f="fee"></span> USD for the Term</td><td>Paid to the Provider in full before work begins</td></tr>
+<tr><td>Ad Spend</td><td>$<span data-f="spend"></span> USD over the Term (about $<span data-f="daily"></span> per day)</td><td>Paid by the Client directly to Meta (or the agreed platform) on the Client's own card or ad account</td></tr>
+<tr><td>Term</td><td><span data-f="days"></span> days from the Launch Date</td><td></td></tr>
+<tr><td><b>Total Spend</b></td><td><b>$<span data-f="total"></span> USD</b> (Service Fee + Ad Spend)</td><td></td></tr>
 </table>
 <ul>
-<li><b>Ad spend is separate from the Service Fee.</b> The Client pays it directly to Meta (or the agreed platform) on the Client's own card or ad account. Ad spend is never refundable by the Provider, including under the Guarantee.</li>
-<li>After the first 30 days, the Service Fee stays at $1,000 USD per month. The Client may add further services at any time for an additional monthly fee agreed in writing.</li>
-<li>Work starts when the first Service Fee clears and the Client has provided the access and approvals in Section 5.</li>
-<li>Late payments may pause the campaign. A paused campaign pauses the Guarantee Period clock.</li>
+<li><b>Ad Spend is separate from the Service Fee.</b> The Provider never receives or holds the Client's Ad Spend. Ad Spend is never refundable by the Provider, including under the Guarantee.</li>
+<li>The Provider will set the ad account's spending limit to the Ad Spend above, so the campaign cannot spend more without the Client's written approval.</li>
+<li><b>Launch Date</b> means the date the Client's first ad is approved by the platform and begins delivering. The Provider will confirm it to the Client in writing (email or text).</li>
+<li>Work starts when the Service Fee clears and the Client has provided the access and approvals in Section 5.</li>
+<li>Declined ad payments or a paused ad account pause the Term until ads are running again.</li>
 </ul>
 
-<h3>4. The 30-Lead Guarantee</h3>
-<p>The Provider guarantees the Client will receive at least <b>30 Exclusive Qualified Leads within the first 30 days after the Launch Date</b> (the "Guarantee Period"). If fewer than 30 are delivered, the Client is entitled to the remedy in Section 7.</p>
-<p><b>Launch Date</b> means the date the Client's first ad is approved by the platform and begins delivering. The Provider will confirm it to the Client in writing (email or text).</p>
-<p><b>What counts as a Qualified Lead</b></p>
-<p>A Qualified Lead is a homeowner who submits all of the following through the Provider's form or landing page:</p>
+<h3>4. The Positive-ROI Guarantee</h3>
+<p>The Provider guarantees that the <b>Sold Job Value</b> from the Client's Leads will be <b>more than the Client's Total Spend of $<span data-f="total"></span> USD</b>. If it is not, and the Client has met every condition in Section 5, the Client is entitled to the refund in Section 7.</p>
+<p><b>Definitions</b></p>
+<ul>
+<li><b>Lead</b> means a person who submits the Provider's form or landing page for the Client during the Term.</li>
+<li><b>Sold Job</b> means work a Lead agrees to buy from the Client, by signing a quote or contract or paying a deposit, during the Term or within <b>14 days after the Term ends</b> (together, the <b>"Measurement Window"</b>). Any electrical service counts, not only the one advertised.</li>
+<li><b>Sold Job Value</b> means the total price of all Sold Jobs before tax, at the Client's usual prices.</li>
+</ul>
+<p><b>What each Lead includes</b></p>
+<p>The Provider's form collects the following from each Lead:</p>
 <ol>
 <li>Full name</li>
 <li>Email address</li>
 <li>Phone number</li>
-<li>Home location (address or city and ZIP code) within the Client's service area</li>
+<li>Home location (address or city and ZIP code)</li>
 <li>Service needed: EV charger installation, home generator, or panel upgrade</li>
 <li>Answers to the qualifying questions for that service (table below)</li>
 <li>When they want the work done</li>
@@ -451,55 +461,46 @@
 <tr><td>Home generator</td><td>Whole-home or partial backup; fuel available at the home (natural gas, propane, or not sure)</td></tr>
 <tr><td>Panel upgrade</td><td>Current panel size in amps (or not sure); reason for the upgrade (EV charger, heat pump, renovation, old or unsafe panel, other)</td></tr>
 </table>
-<p>Leads for all three services count together toward the 30.</p>
-<p><b>What counts as Exclusive</b></p>
-<p>Each lead is generated from campaigns run solely for the Client. The Provider will not sell, share or deliver that lead to any other contractor or business.</p>
-<p><b>What does not count toward the 30</b></p>
-<ul>
-<li>Duplicates of a lead already delivered in the Guarantee Period (same phone or email)</li>
-<li>Submissions with a fake name, a disconnected or invalid phone number, or an invalid email address</li>
-<li>Homes located outside the Client's service area listed in Section 1</li>
-<li>Test, spam or bot submissions, and submissions by the Client or the Client's staff</li>
-</ul>
-<p><b>Disputing a lead</b></p>
-<p>The Client must report any lead it believes is invalid within <b>7 days</b> of delivery, by email, with the reason. Leads not disputed within 7 days count as Qualified Leads. The Provider will review each dispute in good faith and will replace confirmed invalid leads at no cost.</p>
+<p><b>Exclusive leads</b></p>
+<p>Each Lead is generated from campaigns run solely for the Client. The Provider will not sell, share or deliver that Lead to any other contractor or business.</p>
 
 <h3>5. Conditions of the Guarantee</h3>
-<p>The Guarantee applies only if the Client does all of the following during the Guarantee Period:</p>
+<p>The Guarantee applies only if the Client does all of the following:</p>
 <ul>
 <li>Pays the Service Fee in full before launch</li>
-<li>Funds at least $2,000 USD of ad spend across the 30 days (about $67 per day), with no pauses, budget cuts or declined payments</li>
+<li>Funds the full Ad Spend of $<span data-f="spend"></span> USD across the Term, with no pauses, budget cuts or declined payments</li>
 <li>Gives the Provider access to its ad account, business page and any other assets reasonably requested within 3 business days of signing</li>
 <li>Approves or comments on ad creative within 2 business days of receiving it</li>
 <li>Does not edit, pause or change the campaigns, targeting or forms without the Provider's written agreement</li>
+<li>Contacts every Lead promptly: a first call or text within 1 business day of delivery, and at least 3 attempts within 5 business days if the Lead doesn't answer</li>
+<li>Quotes Leads at its usual prices and terms</li>
+<li>Records the outcome of every Lead in the leads dashboard (Contacted, Quoted, Sold with its job value, Not interested or Bad lead) within 7 days of that outcome, and no later than the end of the Measurement Window</li>
+<li>On request, shows the Provider the quote, contract, invoice or deposit for any Lead marked Quoted or Sold</li>
 <li>Keeps a service area of at least <span data-f="radius"></span> miles radius (or the ZIP codes listed in Section 1)</li>
 <li>Holds a valid licence and any permits required to perform the advertised services</li>
 </ul>
-<p>If the Client breaks a condition, the Guarantee is void. If the ad platform rejects ads or restricts the Client's account for reasons tied to the Client's business, the Guarantee Period is paused until ads are running again.</p>
+<p>If the Client breaks a condition, the Guarantee is void. If the ad platform rejects ads or restricts the Client's account for reasons tied to the Client's business, the Term is paused until ads are running again.</p>
 
 <h3>6. What Is Not Guaranteed</h3>
-<p>The Guarantee covers the number of leads delivered only. The Provider does not guarantee that any lead will answer, book, buy, or result in a sale, job or specific revenue. Lead quality beyond the definition in Section 4 is not guaranteed.</p>
+<p>The Guarantee covers Sold Job Value only. The Provider does not guarantee a number of Leads, that any Lead will answer, book or buy, the Client's profit after its own costs, cash collected, or any result after the Measurement Window.</p>
 
 <h3>7. Refund Remedy</h3>
-<p>If fewer than 30 Exclusive Qualified Leads are delivered in the Guarantee Period and the Client has met every condition in Section 5, the Client may choose one of the following:</p>
-<ol>
-<li><b>Full refund of the first month's Service Fee ($1,000 USD).</b> The Client must request it by email within <b>14 days</b> after the Guarantee Period ends. The Provider will pay it within <b>14 business days</b> of the request, to the original payment method.</li>
-<li><b>Free continuation.</b> The Provider keeps running and managing the campaign, with no Service Fee, until the 30th Qualified Lead is delivered. The Client keeps paying ad spend.</li>
-</ol>
-<p>The refund covers the Service Fee only. Ad spend paid to the platform is not refundable. This refund is the Client's sole and exclusive remedy for a missed Guarantee.</p>
+<p>If the Sold Job Value at the end of the Measurement Window is not more than the Total Spend, and the Client has met every condition in Section 5, the Provider will refund the full Service Fee of <b>$<span data-f="fee"></span> USD</b>. The Client must request it by email within <b>14 days</b> after the Measurement Window ends. The Provider will pay it within <b>14 business days</b> of the request, to the original payment method.</p>
+<p>The refund covers the Service Fee only. Ad Spend paid to the platform is not refundable. This refund is the Client's sole and exclusive remedy for a missed Guarantee.</p>
 
 <h3>8. Term and Cancellation</h3>
 <ul>
-<li><b>No long-term contract.</b> Service runs month to month from the Effective Date.</li>
-<li><b>Cancel anytime.</b> Either Party may cancel at any time by written notice (email is enough). Cancellation takes effect at the end of the current paid month, and no further Service Fees are charged.</li>
-<li>Service Fees already paid are not refunded, except under Section 7.</li>
-<li>If the Client cancels before the Guarantee Period ends, the Guarantee no longer applies.</li>
+<li><b>No long-term contract.</b> This Agreement covers one Term of <span data-f="days"></span> days from the Launch Date.</li>
+<li>Service after the Term continues only if the Client agrees in writing (email is enough) to a new term, fee and ad spend.</li>
+<li>Either Party may cancel at any time by written notice (email is enough). The Service Fee already paid is not refunded, except under Section 7.</li>
+<li>If the Client cancels before the Term ends, the Guarantee no longer applies.</li>
 </ul>
 
 <h3>9. Client Responsibilities and Compliance</h3>
 <ul>
 <li>The Client is responsible for how it contacts leads, including compliance with the Telephone Consumer Protection Act (TCPA), CAN-SPAM, state telemarketing and do-not-call rules, and any other US federal, state or local law.</li>
 <li>The Provider's forms will include a consent notice for the Client to contact the lead. The Client will honour opt-out requests promptly.</li>
+<li>Unless the Client provides its own, the Provider will host a basic privacy policy for the Client's lead forms at tradie-ads.com, written from the details the Client gives in onboarding. The Client confirms those details are accurate, will tell the Provider if they change, and may replace the policy with its own at any time.</li>
 <li>The Client confirms that the services, offers and claims it asks the Provider to advertise are accurate and that it is licensed to perform them.</li>
 <li>The Client will use lead data only to serve that lead and will protect it from unauthorized access.</li>
 </ul>
@@ -526,7 +527,7 @@
 </ul>
 
 <h3>15. Signatures</h3>
-<p>By signing, each Party confirms it has read, understood and agrees to this Agreement, including the conditions of the 30-Lead Guarantee.</p>
+<p>By signing, each Party confirms it has read, understood and agrees to this Agreement, including the conditions of the Positive-ROI Guarantee.</p>
 <div class="sigs">
 <p><b>Provider — 13541398 Canada Inc., operating as Tradie Ads</b></p>
 <p>Signature: <span class="script">Ethan Eigenfeldt</span></p>
@@ -569,7 +570,13 @@ var CONFIG = {
   // alerts + the client's signed-agreement email. Blank = off.
   notifyUrl: "",
   // Version label saved with each signature. Bump it whenever the agreement text in <template id="agreement-text"> changes.
-  agreementVersion: "2026-11-18",
+  agreementVersion: "2026-11-20",
+  // Packages, picked by the ?plan= code in the client's onboarding link (e.g. ?plan=30). The agreement shows the
+  // client's package filled in and locked; without a valid plan in the link they can't sign. Amounts in USD.
+  packages: {
+    "30": { label: "30-day package", fee: 1000, spend: 1000, days: 30 },
+    "14": { label: "2-week starter", fee: 500, spend: 500, days: 14 }
+  },
   // Section 5 minimum service-area radius (miles). Blank = the line shows "______".
   minRadiusMiles: "15",
   // Tradie Ads' Meta Business Manager ID (Business Settings → Business info).
@@ -609,6 +616,15 @@ var CONFIG = {
   if (q.get("business")) $("[data-biz-help]").hidden = false;
   // Per-client leads spreadsheet: ?sheet=https://docs.google.com/spreadsheets/...
   if (/^https:\/\/docs\.google\.com\//.test(q.get("sheet") || "")) state.data.sheet = q.get("sheet");
+  // Package: ?plan=30 or ?plan=14 (CONFIG.packages). Locked once the agreement is signed.
+  if (!state.signature && CONFIG.packages[q.get("plan")]) state.data.plan = q.get("plan");
+  function plan() {
+    var code = state.signature && state.signature.plan ? state.signature.plan : state.data.plan;
+    var p = CONFIG.packages[code];
+    if (!p) return null;
+    return { code: code, label: p.label, fee: p.fee, spend: p.spend, days: p.days, total: p.fee + p.spend, daily: Math.round(p.spend / p.days) };
+  }
+  function money(n) { return Number(n).toLocaleString("en-US"); }
 
   function send(event, extra) {
     var d = state.data, body = new URLSearchParams();
@@ -625,6 +641,9 @@ var CONFIG = {
     body.set("lead_emails", (d.lead_emails || []).join(", ")); body.set("lead_phones", (d.lead_phones || []).join(", "));
     body.set("facebook_access_sent", state.gates && state.gates.facebook ? "yes" : "no");
     body.set("sheet_url", d.sheet || "");
+    var pk = plan();
+    body.set("package", pk ? pk.label : ""); body.set("service_fee", pk ? pk.fee : ""); body.set("ad_spend", pk ? pk.spend : "");
+    body.set("term_days", pk ? pk.days : ""); body.set("total_spend", pk ? pk.total : "");
     Object.keys(extra || {}).forEach(function (k) { body.set(k, extra[k]); });
     body.set("page", location.href.split("?")[0]); body.set("submitted_at", new Date().toISOString());
     var urls = [CONFIG.webhookUrl, CONFIG.notifyUrl].filter(Boolean);
@@ -639,7 +658,9 @@ var CONFIG = {
     var d = state.data;
     try {
       fetch(LEADS_API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, keepalive: true,
-        body: JSON.stringify({ action: "register", email: d.email, name: d.name, phone: d.phone, business: d.business, sheet: d.sheet || "" }) }).catch(function () {});
+        body: JSON.stringify({ action: "register", email: d.email, name: d.name, phone: d.phone, business: d.business, sheet: d.sheet || "",
+          service_fee: (plan() || {}).fee || "", ad_spend: (plan() || {}).spend || "", term_days: (plan() || {}).days || "",
+          lead_emails: (d.lead_emails || []).join(", ") }) }).catch(function () {});
     } catch (e) {}
   }
   function dashboardUrl() { return "leads.html?email=" + encodeURIComponent(state.data.email || "") + "&send=1&welcome=1"; }
@@ -821,13 +842,24 @@ var CONFIG = {
   function today() { return new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }); }
   function fillDoc() {
     var a = state.agreement, g = state.signature, d = state.data;
-    var sigName = g ? g.name : (fsig.elements.signature.value.trim() || "");
+    var sigName = g ? g.name : (fsig.elements.signature.value.trim() || ""), pk = plan();
+    var pn = $("[data-plan-note]");
+    if (pn) {
+      pn.innerHTML = "";
+      var b = document.createElement("b");
+      b.textContent = pk ? pk.label + ": $" + money(pk.fee) + " service fee + $" + money(pk.spend) + " ad spend over " + pk.days + " days" : "Your package is missing from this link.";
+      pn.appendChild(b);
+      pn.appendChild(document.createTextNode(pk ? " This is set from your call and shown in Section 3. If it's not what we agreed, text (650) 719-7145 before signing." : " Ask Tradie Ads for your personal onboarding link (text (650) 719-7145). You can't sign without it."));
+      pn.classList.toggle("bad-note", !pk);
+    }
     var vals = {
       date: g ? new Date(g.at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : today(),
       legal_name: a.legal_name, entity_type: a.entity_type, state: a.state, address: a.address,
       rep: [sigName || d.name, a.title].filter(Boolean).join(", "),
       email: d.email, phone: d.phone, service_area: a.service_area, title: a.title,
       radius: CONFIG.minRadiusMiles,
+      fee: pk ? money(pk.fee) : "", spend: pk ? money(pk.spend) : "", days: pk ? pk.days : "",
+      total: pk ? money(pk.total) : "", daily: pk ? money(pk.daily) : "",
       sig: g ? g.name : "", sig_name: g ? g.name : "",
       sig_date: g ? new Date(g.at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""
     };
@@ -910,10 +942,11 @@ var CONFIG = {
     fsig.elements.signature.classList.remove("bad");
     var missing = AF.filter(function (k) { var el = fsig.elements[k]; el.classList.remove("bad"); if (!el.value.trim()) { el.classList.add("bad"); return true; } return false; });
     if (missing.length) { err.textContent = "Fill in every blank above before signing."; err.hidden = false; fsig.elements[missing[0]].focus(); return; }
+    if (!plan()) { err.textContent = "Your package is missing from this link. Text (650) 719-7145 for your personal onboarding link."; err.hidden = false; return; }
     if (name.split(/\s+/).length < 2) { fsig.elements.signature.classList.add("bad"); err.textContent = "Type your full name (first and last) to sign."; err.hidden = false; return; }
     if (!fsig.elements.agree.checked) { err.textContent = "Tick the box to confirm you've read the agreement."; err.hidden = false; return; }
     err.hidden = true;
-    state.signature = { name: name, at: new Date().toISOString(), version: CONFIG.agreementVersion };
+    state.signature = { name: name, at: new Date().toISOString(), version: CONFIG.agreementVersion, plan: plan().code };
     save();
     var a = state.agreement;
     send("agreement_signed", { signature_name: name, signer_title: a.title, signed_at: state.signature.at, signed_date: today(), agreement_version: CONFIG.agreementVersion,

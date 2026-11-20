@@ -87,6 +87,26 @@
   .stat b { display: block; font: 900 30px/1 Archivo, sans-serif; color: #fff; margin-top: 10px; font-variant-numeric: tabular-nums; }
   .stat.hi b { color: var(--blue-hi); }
 
+  .roi { padding: 18px 20px; margin-bottom: 18px; }
+  .roi .top-line { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .roi small { font: 700 11px/1 Archivo, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .roi .big { font: 900 30px/1.1 Archivo, sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; margin-top: 6px; }
+  .roi .big span { font-size: 17px; color: var(--muted); font-weight: 700; }
+  .roi .pill { font: 700 13px/1 Inter, sans-serif; padding: 7px 11px; border-radius: 999px; background: #eef2fb; color: var(--muted); white-space: nowrap; }
+  .roi .pill.win { background: #e5f6ea; color: #116b32; }
+  .roi .bar { height: 10px; border-radius: 99px; background: #e9eef8; margin: 14px 0 10px; overflow: hidden; }
+  .roi .bar i { display: block; height: 100%; width: 0; background: var(--blue); border-radius: 99px; transition: width .4s; }
+  .roi .bar i.win { background: var(--ok); }
+  .roi p { font-size: 14px; color: var(--muted); }
+  td.out { white-space: nowrap; cursor: default; }
+  .out select, .out input { height: 36px; border: 1.5px solid var(--field); border-radius: 9px; font: 500 14px Inter, sans-serif; color: var(--ink); background: #fff; padding: 0 8px; }
+  .out select:focus, .out input:focus { outline: none; border-color: var(--blue); }
+  .out select.s-sold { border-color: var(--ok); background: #effaf2; }
+  .out select.s-new { color: var(--muted); }
+  .out .val { display: inline-flex; align-items: center; gap: 4px; margin-left: 6px; }
+  .out input { width: 96px; font-variant-numeric: tabular-nums; }
+  .out .saved { font-size: 12px; color: var(--ok); margin-left: 6px; }
+  .out .oops { font-size: 12px; color: var(--alert); margin-left: 6px; }
   .sheet { overflow: hidden; }
   .toolbar { display: flex; gap: 10px; align-items: center; padding: 14px; border-bottom: 1px solid var(--edge); flex-wrap: wrap; }
   .search { position: relative; flex: 1; min-width: 200px; }
@@ -202,6 +222,15 @@
     <div class="titlebar">
       <div><h1>Your leads</h1><div class="biz" data-biz></div></div>
       <span class="live off" data-live><span class="dot"></span><span data-live-text>Connecting…</span></span>
+    </div>
+
+    <div class="card roi" data-roi hidden>
+      <div class="top-line">
+        <div><small>Sold from your leads</small><div class="big"><b data-roi-sold>$0</b> <span>of $<span data-roi-total>0</span> total spend</span></div></div>
+        <span class="pill" data-roi-pill></span>
+      </div>
+      <div class="bar"><i data-roi-bar></i></div>
+      <p data-roi-text></p>
     </div>
 
     <div class="stats">
@@ -332,12 +361,16 @@
     } else if (!email) fe.elements.email.focus();
   }
 
-  $("[data-signout]").addEventListener("click", function () { delItem(AUTH_KEY); rows = []; known = null; openIds = {}; freshThisVisit = {}; showSignin(); });
+  $("[data-signout]").addEventListener("click", function () { delItem(AUTH_KEY); rows = []; outcomes = {}; info = null; known = null; openIds = {}; freshThisVisit = {}; $("[data-roi]").hidden = true; showSignin(); });
 
   // ---------- leads ----------
   var META = { id: 1, ad_id: 1, ad_name: 1, adset_id: 1, adset_name: 1, campaign_id: 1, campaign_name: 1, form_id: 1, form_name: 1,
     is_organic: 1, platform: 1, lead_status: 1, inbox_url: 1, retailer_item_id: 1, created_time: 1 };
   var cols = null, rows = [], known = null, lastSeen = 0, freshThisVisit = {}, openIds = {}, timer = null, lastOk = 0, info = null;
+  var outcomes = {}, renderLater = false;
+  var STATUSES = ["New", "Contacted", "Quoted", "Sold", "Not interested", "Bad lead"];
+  function money(n) { return "$" + Math.round(Number(n) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+  function outcomeOf(L) { return outcomes[L.id] || { status: "New", job_value: 0 }; }
 
   function key(h) { return String(h || "").trim().toLowerCase().replace(/\s+/g, "_"); }
   function nice(h) {
@@ -386,7 +419,7 @@
     var c = cols, g = function (i) { return i > -1 ? String(r[i] == null ? "" : r[i]).trim() : ""; };
     var name = g(c.name) || [g(c.first), g(c.last)].filter(Boolean).join(" ");
     return {
-      id: g(c.id) || r.join("\u0001"), t: parseTime(g(c.time)), rawTime: g(c.time), order: idx,
+      id: g(c.id) || ("t:" + g(c.time) + "|" + g(c.phone).replace(/\D/g, "")).slice(0, 200), t: parseTime(g(c.time)), rawTime: g(c.time), order: idx,
       name: name, phone: phone(g(c.phone)), email: g(c.email),
       answers: c.answers.map(function (i) { return niceVal(r[i]); }),
       platform: g(c.platform), ad: g(c.ad), form: g(c.form), campaign: g(c.campaign)
@@ -421,7 +454,7 @@
     // header
     th.innerHTML = "";
     var hr = el("tr");
-    ["Received", "Name", "Phone", "Email"].concat(cols.answers.map(function (i) { return nice(cols.headers[i]); }))
+    ["Received", "Name", "Phone", "Email", "Outcome"].concat(cols.answers.map(function (i) { return nice(cols.headers[i]); }))
       .forEach(function (h, i) { var c = el("th", null, h); hr.appendChild(c); });
     th.appendChild(hr);
 
@@ -438,21 +471,80 @@
       if (isNew || freshThisVisit[L.id]) tdN.appendChild(el("span", "badge", "New"));
       var tdP = el("td", "phone"); cellText(tdP, L.phone);
       var tdE = el("td", "email"); cellText(tdE, L.email);
-      [tdW, tdN, tdP, tdE].forEach(function (c) { tr.appendChild(c); });
+      [tdW, tdN, tdP, tdE, outcomeCell(L)].forEach(function (c) { tr.appendChild(c); });
       L.answers.forEach(function (a) { var c = el("td", "ans"); cellText(c, a); tr.appendChild(c); });
       tr.addEventListener("click", function (ev) {
         if (window.getSelection && String(window.getSelection())) return;   // let people select text to copy
+        if (ev.target.closest && ev.target.closest("td.out")) return;       // outcome controls don't open the row
         var next = tr.nextElementSibling;
         if (next && next.classList.contains("detail")) { next.remove(); delete openIds[L.id]; return; }
         openIds[L.id] = 1;
-        tr.after(detailRow(L, 4 + L.answers.length));
+        tr.after(detailRow(L, 5 + L.answers.length));
       });
       tb.appendChild(tr);
-      if (openIds[L.id]) tb.appendChild(detailRow(L, 4 + L.answers.length));
+      if (openIds[L.id]) tb.appendChild(detailRow(L, 5 + L.answers.length));
     });
 
     var total = rows.length;
     $("[data-count]").textContent = term ? list.length + " of " + total + " leads match \"" + search.value.trim() + "\"" : total + (total === 1 ? " lead" : " leads") + " · tap a lead to see all their answers";
+  }
+
+  // ---------- outcomes (what the Positive-ROI Guarantee is measured on) ----------
+  function outcomeCell(L) {
+    var td = el("td", "out"), o = outcomeOf(L);
+    var sel = el("select"); sel.setAttribute("aria-label", "Outcome for " + (L.name || "this lead"));
+    STATUSES.forEach(function (st) { var op = el("option", null, st); op.value = st; if (st === o.status) op.selected = true; sel.appendChild(op); });
+    sel.className = "s-" + o.status.toLowerCase().replace(/\s+/g, "-");
+    var wrap = el("span", "val"), inp = el("input");
+    inp.type = "text"; inp.inputMode = "numeric"; inp.placeholder = "Job $"; inp.setAttribute("aria-label", "Sold job value in dollars");
+    inp.value = o.job_value ? money(o.job_value).slice(1) : "";
+    wrap.appendChild(document.createTextNode("$")); wrap.appendChild(inp);
+    wrap.hidden = o.status !== "Sold";
+    var note = el("span");
+    function flash(ok, text) { note.className = ok ? "saved" : "oops"; note.textContent = text; if (ok) setTimeout(function () { note.textContent = ""; }, 2000); }
+    function save() {
+      var status = sel.value, value = status === "Sold" ? Number(inp.value.replace(/[$,\s]/g, "")) || 0 : 0;
+      var before = outcomeOf(L);
+      outcomes[L.id] = { status: status, job_value: value }; roi();
+      api("outcome", { token: (auth() || {}).token, lead_id: L.id, status: status, job_value: value }).then(function (r) {
+        if (r && r.ok) flash(true, "Saved");
+        else { outcomes[L.id] = before; roi(); flash(false, r && r.error === "signed_out" ? "Signed out" : "Not saved, try again"); }
+      }, function () { outcomes[L.id] = before; roi(); flash(false, "Not saved, try again"); });
+    }
+    sel.addEventListener("change", function () {
+      sel.className = "s-" + sel.value.toLowerCase().replace(/\s+/g, "-");
+      wrap.hidden = sel.value !== "Sold";
+      if (sel.value === "Sold" && !inp.value) { inp.focus(); return; }   // saved once they enter the job value
+      save();
+    });
+    inp.addEventListener("input", function () { inp.value = inp.value.replace(/[^\d,]/g, ""); });
+    inp.addEventListener("change", save);
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") inp.blur(); });
+    td.appendChild(sel); td.appendChild(wrap); td.appendChild(note);
+    td.addEventListener("focusout", function () { setTimeout(function () { if (renderLater && !editing()) { renderLater = false; render(); } }, 0); });
+    return td;
+  }
+  function editing() { var a = document.activeElement; return !!(a && a.closest && a.closest("td.out")); }
+
+  function roi() {
+    var p = (info && info.plan) || {}, total = (p.fee || 0) + (p.spend || 0), box = $("[data-roi]");
+    if (!total) { box.hidden = true; return; }
+    var sold = 0, nSold = 0, nQuoted = 0, ids = {};
+    rows.forEach(function (L) { ids[L.id] = 1; });
+    Object.keys(outcomes).forEach(function (id) {
+      if (!ids[id]) return;
+      var o = outcomes[id];
+      if (o.status === "Sold") { sold += o.job_value || 0; nSold++; } else if (o.status === "Quoted") nQuoted++;
+    });
+    var win = sold > total;
+    box.hidden = false;
+    $("[data-roi-sold]").textContent = money(sold);
+    $("[data-roi-total]").textContent = money(total).slice(1);
+    var bar = $("[data-roi-bar]"); bar.style.width = Math.min(100, total ? sold / total * 100 : 0) + "%"; bar.classList.toggle("win", win);
+    var pill = $("[data-roi-pill]"); pill.classList.toggle("win", win);
+    pill.textContent = win ? "Positive ROI" : money(total - sold) + " to go";
+    $("[data-roi-text]").textContent = nSold + (nSold === 1 ? " job sold" : " jobs sold") + " · " + nQuoted + " quoted. " +
+      "Total spend is your " + money(p.fee) + " fee + " + money(p.spend) + " ad spend. Mark every lead's outcome below, and add the job value when you sell one.";
   }
 
   function detailRow(L, span) {
@@ -513,7 +605,7 @@
       var has = r.status === "live" && headers.length && data.length;
       $("[data-toolbar]").hidden = !has; $("[data-count]").hidden = !has; $("[data-table-wrap]").hidden = !has; $("[data-blank]").hidden = !!has;
       if (!has) {
-        rows = []; stats();
+        rows = []; stats(); roi();
         $("[data-blank-title]").textContent = "No leads yet";
         return;
       }
@@ -537,7 +629,9 @@
       var newest = next.reduce(function (m, L) { return Math.max(m, L.t || 0); }, 0);
       if (newest) setItem(seenKey, String(newest));
       rows = next;
-      stats(); render();
+      outcomes = r.outcomes || {};
+      stats(); roi();
+      if (editing()) renderLater = true; else render();
     }, function () { setLive(false); });
   }
 
@@ -555,10 +649,11 @@
 
   $("[data-csv]").addEventListener("click", function () {
     if (!rows.length) return;
-    var head = ["Received", "Name", "Phone", "Email"].concat(cols.answers.map(function (i) { return nice(cols.headers[i]); }));
+    var head = ["Received", "Name", "Phone", "Email", "Outcome", "Job value"].concat(cols.answers.map(function (i) { return nice(cols.headers[i]); }));
     var esc = function (v) { v = String(v == null ? "" : v); if (/^[=+\-@]/.test(v)) v = "'" + v; return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
     var lines = [head.map(esc).join(",")].concat(rows.map(function (L) {
-      return [L.t ? new Date(L.t).toLocaleString() : L.rawTime, L.name, L.phone, L.email].concat(L.answers).map(esc).join(",");
+      var o = outcomeOf(L);
+      return [L.t ? new Date(L.t).toLocaleString() : L.rawTime, L.name, L.phone, L.email, o.status, o.status === "Sold" ? o.job_value : ""].concat(L.answers).map(esc).join(",");
     }));
     var blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
     var a = document.createElement("a"); a.href = URL.createObjectURL(blob);

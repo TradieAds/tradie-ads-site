@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daily Check · Tradie Ads</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<meta name="theme-color" content="#070b14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070b14; --line: #1e2a44;
+    --blue: #1f5eff; --blue-hi: #4d82ff; --blue-dark: #1a50db;
+    --card: #fff; --edge: #e3e8f2; --field: #d5dceb; --row: #f7f9fe;
+    --ink: #0a0f1e; --text: #1a2133; --muted: #4a5670; --soft: #93a0bb;
+    /* chart roles (dataviz reference palette, light surface) */
+    --series-1: #2a78d6; --track: #cde2fb; --grid: #e9edf4; --axis: #c9d1df;
+    --good: #0ca30c; --warning: #fab219; --critical: #d03b3b; --info: #93a0bb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body { background: var(--bg); color: var(--text); font: 400 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; min-height: 100vh; display: flex; flex-direction: column; }
+  a { color: var(--blue); }
+  h1, h2, h3 { font-family: Archivo, Inter, system-ui, sans-serif; letter-spacing: -.02em; line-height: 1.1; }
+  [hidden] { display: none !important; }
+  button { font: inherit; }
+  .top { border-bottom: 1px solid var(--line); }
+  .top .in { max-width: 1240px; margin: 0 auto; padding: 0 16px; height: 60px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .top img { height: 28px; width: auto; display: block; }
+  .top .right { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .top .who { color: var(--soft); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ghost { background: none; border: 1px solid var(--line); color: #c9d2e6; border-radius: 9px; padding: 6px 11px; font-size: 13px; font-weight: 600; cursor: pointer; flex: none; }
+  .ghost:hover { border-color: var(--blue-hi); color: #fff; }
+  .stage { flex: 1; color: #eef2fb; padding: 26px 16px 56px; background: radial-gradient(1100px 520px at 80% 0%, rgba(31,94,255,.22), transparent 60%), var(--bg); }
+  .shell { max-width: 1240px; margin: 0 auto; }
+  .card { background: var(--card); color: var(--text); border-radius: 16px; box-shadow: 0 24px 70px rgba(0,0,0,.3); }
+
+  /* sign in */
+  .signin { max-width: 440px; margin: 5vh auto 0; padding: 26px 22px; }
+  .signin h1 { color: var(--ink); font-size: 26px; font-weight: 900; }
+  .signin .lede { color: var(--muted); margin: 8px 0 16px; font-size: 15px; }
+  label.f { display: block; font-weight: 600; font-size: 14px; color: var(--ink); margin: 0 0 6px; }
+  .in-field { width: 100%; height: 48px; border: 1.5px solid var(--field); border-radius: 12px; padding: 0 14px; font: 400 16px Inter, sans-serif; color: var(--ink); }
+  .in-field:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(31,94,255,.12); }
+  .in-code { letter-spacing: .4em; font: 700 24px ui-monospace, Menlo, monospace; text-align: center; }
+  .btn { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 48px; margin-top: 14px; border-radius: 12px; border: 0; background: var(--blue); color: #fff; font: 700 16px Inter, sans-serif; cursor: pointer; }
+  .btn[disabled] { opacity: .5; cursor: wait; }
+  .link { background: none; border: 0; color: var(--blue); cursor: pointer; font-size: 14px; font-weight: 600; }
+  .msg { font-size: 14px; margin-top: 10px; color: var(--critical); }
+  .row-between { display: flex; justify-content: space-between; margin-top: 14px; gap: 10px; flex-wrap: wrap; }
+
+  /* page head */
+  .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  .head h1 { color: #fff; font-size: clamp(26px, 4.5vw, 36px); font-weight: 900; }
+  .head p { color: #b9c4dc; margin-top: 6px; font-size: 14px; }
+  .head .acts { display: flex; gap: 8px; align-items: center; color: #b9c4dc; font-size: 13px; }
+
+  /* collapsible sections */
+  .sec { margin-bottom: 12px; overflow: hidden; }
+  .sec > .bar { width: 100%; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 14px; padding: 16px 18px; background: none; border: 0; text-align: left; cursor: pointer; color: inherit; }
+  .sec > .bar:hover { background: var(--row); }
+  .sec > .bar:focus-visible { outline: 3px solid var(--blue-hi); outline-offset: -3px; }
+  .chev { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; color: var(--muted); transition: transform .2s; }
+  .sec.open .chev { transform: rotate(180deg); }
+  .chev svg { width: 18px; height: 18px; }
+  .sec .body { border-top: 1px solid var(--edge); padding: 16px 18px 18px; }
+  .us-title { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .us-title h2 { font-size: 20px; color: var(--ink); }
+  .us-title span { font-size: 13px; color: var(--muted); }
+  .summary { display: flex; gap: 22px; flex-wrap: wrap; margin-top: 6px; font-size: 14px; color: var(--muted); }
+  .summary b { color: var(--ink); font-weight: 700; }
+
+  /* stat tiles */
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 860px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .tile { border: 1px solid var(--edge); border-radius: 12px; padding: 12px 14px; }
+  .tile small { display: block; font-size: 12.5px; color: var(--muted); font-weight: 600; }
+  .tile b { display: block; font: 800 24px/1.15 Archivo, Inter, sans-serif; color: var(--ink); margin-top: 6px; }
+  .tile em { display: block; font-style: normal; font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+
+  /* charts */
+  .charts { display: grid; grid-template-columns: repeat(var(--n, 2), minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+  @media (max-width: 860px) { .charts { grid-template-columns: 1fr; } }
+  .chart h3 { font: 700 13.5px/1.2 Inter, sans-serif; letter-spacing: 0; color: var(--ink); display: flex; justify-content: space-between; gap: 8px; }
+  .chart h3 span { color: var(--muted); font-weight: 500; }
+  .plot { position: relative; height: 150px; margin-top: 8px; }
+  .plot svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .plot .tick { font: 500 11px Inter, sans-serif; fill: var(--muted); font-variant-numeric: tabular-nums; }
+  .chart details { margin-top: 6px; font-size: 12.5px; color: var(--muted); }
+  .chart summary { cursor: pointer; width: max-content; }
+  .chart table { border-collapse: collapse; margin-top: 6px; font-variant-numeric: tabular-nums; }
+  .chart td, .chart th { padding: 2px 12px 2px 0; text-align: left; font-weight: 500; }
+  .tip { position: fixed; z-index: 10; pointer-events: none; background: #0a0f1e; color: #fff; border-radius: 8px; padding: 7px 10px; font-size: 12.5px; line-height: 1.35; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+  .tip b { font-size: 14px; display: block; }
+  .tip span { color: #b9c4dc; }
+
+  /* clients */
+  .clients-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin: 26px 0 12px; }
+  .clients-head h2 { color: #fff; font-size: 22px; }
+  .clients-head p { color: #b9c4dc; font-size: 14px; margin-top: 4px; }
+  .crow { display: grid; grid-template-columns: minmax(170px, 1.5fr) 92px 92px 110px minmax(150px, 1.3fr) minmax(150px, 1.4fr); gap: 14px; align-items: center; }
+  .crow .nm b { display: block; color: var(--ink); font-size: 15.5px; font-weight: 700; }
+  .crow .nm span, .crow .k span { font-size: 12.5px; color: var(--muted); display: block; }
+  .crow .k b { font: 700 16px/1.2 Inter, sans-serif; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .meter { height: 8px; border-radius: 99px; background: var(--track); overflow: hidden; margin-top: 6px; }
+  .meter i { display: block; height: 100%; border-radius: 99px; background: var(--series-1); }
+  .meter i.win { background: var(--good); }
+  .flags { display: flex; flex-wrap: wrap; gap: 6px 10px; }
+  .flag { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: var(--text); white-space: nowrap; }
+  .flag svg { width: 14px; height: 14px; flex: none; }
+  .ok-line { font-size: 12.5px; color: var(--muted); }
+  @media (max-width: 960px) {
+    .crow { grid-template-columns: 1fr 1fr 1fr; }
+    .crow .nm { grid-column: 1 / -1; }
+    .crow .sold, .crow .flags { grid-column: 1 / -1; }
+  }
+  .foot-line { margin-top: 14px; font-size: 12.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  .note { margin-top: 12px; font-size: 12.5px; color: var(--muted); }
+  .note b { color: var(--text); }
+  .empty { padding: 28px 18px; color: var(--muted); text-align: center; }
+  .spin { width: 28px; height: 28px; border: 3px solid rgba(255,255,255,.2); border-top-color: var(--blue-hi); border-radius: 50%; margin: 70px auto; animation: rot .8s linear infinite; }
+  @keyframes rot { to { transform: rotate(360deg); } }
+  .notice { text-align: center; color: #b9c4dc; padding: 60px 16px; }
+  .notice h1 { color: #fff; font-size: 26px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <a href="ops.html"><img src="assets/logo-white.png" alt="Tradie Ads"></a>
+  <div class="right"><span class="who" data-who></span><button type="button" class="ghost" data-signout hidden>Sign out</button></div>
+</div></header>
+
+<main class="stage"><div class="shell">
+  <div class="spin" data-view="loading"></div>
+  <div class="notice" data-view="offline" hidden><h1>Not available yet</h1><p>This page isn't switched on yet.</p></div>
+  <div class="notice" data-view="denied" hidden><h1>This page is for the Tradie Ads team</h1><p>Clients: your leads are at <a href="leads.html" style="color:var(--blue-hi)">tradie-ads.com/leads</a>.</p></div>
+
+  <section class="card signin" data-view="signin" hidden>
+    <form data-form="email" novalidate>
+      <h1>Daily check</h1>
+      <p class="lede">Team sign-in. We'll email you a 6-digit code.</p>
+      <label class="f" for="s-email">Email</label>
+      <input class="in-field" id="s-email" name="email" type="email" autocomplete="email" required>
+      <button class="btn" type="submit">Email me a code</button>
+      <p class="msg" data-msg hidden></p>
+    </form>
+    <form data-form="code" novalidate hidden>
+      <h1>Check your email</h1>
+      <p class="lede">Code sent to <b data-sent-to></b>.</p>
+      <label class="f" for="s-code">Sign-in code</label>
+      <input class="in-field in-code" id="s-code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" required>
+      <button class="btn" type="submit">Sign in</button>
+      <p class="msg" data-msg hidden></p>
+      <div class="row-between"><button type="button" class="link" data-change-email>Use a different email</button><button type="button" class="link" data-resend>Send a new code</button></div>
+    </form>
+  </section>
+
+  <section data-view="dash" hidden>
+    <div class="head">
+      <div><h1>Daily check</h1><p data-updated></p></div>
+      <div class="acts"><button type="button" class="ghost" data-refresh>Refresh</button></div>
+    </div>
+
+    <div class="card sec" data-sec="us">
+      <button type="button" class="bar" aria-expanded="true">
+        <div>
+          <div class="us-title"><h2>Tradie Ads</h2><span>our own ads · last 30 days</span></div>
+          <div class="summary" data-us-summary></div>
+        </div>
+        <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </button>
+      <div class="body" data-us-body></div>
+    </div>
+
+    <div class="clients-head">
+      <div><h2>Clients</h2><p data-clients-sum></p></div>
+      <div class="acts"><button type="button" class="ghost" data-all="open">Expand all</button><button type="button" class="ghost" data-all="close">Collapse all</button></div>
+    </div>
+    <div data-clients></div>
+  </section>
+</div></main>
+
+<div class="tip" data-tip hidden></div>
+
+<script src="assets/dashboard-config.js"></script>
+<script>
+(function () {
+  "use strict";
+  var API = window.TA_LEADS_API || "";
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var mem = {};
+  function getItem(k) { try { return localStorage.getItem(k); } catch (e) { return mem[k] || null; } }
+  function setItem(k, v) { try { localStorage.setItem(k, v); } catch (e) { mem[k] = v; } }
+  function delItem(k) { try { localStorage.removeItem(k); } catch (e) {} delete mem[k]; }
+  var AUTH = "ta_ops_auth", OPEN = "ta_ops_open";
+  function auth() { try { return JSON.parse(getItem(AUTH) || "null"); } catch (e) { return null; } }
+  function openMap() { try { return JSON.parse(getItem(OPEN) || "{}"); } catch (e) { return {}; } }
+  function api(action, data) {
+    return fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(Object.assign({ action: action }, data || {})) })
+      .then(function (r) { return r.json(); });
+  }
+  function view(n) { $$("[data-view]").forEach(function (v) { v.hidden = v.getAttribute("data-view") !== n; }); }
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  /* ---------- number formats ---------- */
+  function money(n, cents) {
+    if (n == null || isNaN(n)) return "—";
+    var v = Math.abs(n) >= 10000 ? (n / 1000).toFixed(n >= 100000 ? 0 : 1).replace(/\.0$/, "") + "K" : (cents && n < 100 ? n.toFixed(2) : Math.round(n).toLocaleString("en-US"));
+    return "$" + v;
+  }
+  function num(n) { return n == null ? "—" : Math.round(n).toLocaleString("en-US"); }
+  function sum(a) { return (a || []).reduce(function (s, x) { return s + (x || 0); }, 0); }
+  function pct(a, b) { return b ? Math.round(a / b * 100) + "%" : "—"; }
+  var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function dlabel(d) { var p = d.split("-"); return MON[Number(p[1]) - 1] + " " + Number(p[2]); }
+  function ago(iso) {
+    if (!iso) return "never"; var s = (Date.now() - Date.parse(iso)) / 1000;
+    return s < 90 ? "just now" : s < 3600 ? Math.round(s / 60) + " min ago" : s < 86400 ? Math.round(s / 3600) + " hr ago" : Math.round(s / 86400) + " days ago";
+  }
+
+  /* ---------- sign in (same 6-digit code flow as /leads) ---------- */
+  var fe = $('[data-form="email"]'), fc = $('[data-form="code"]'), pending = "";
+  function msg(f, t) { var m = $("[data-msg]", f); m.textContent = t || ""; m.hidden = !t; }
+  function request(email, f) {
+    return api("send_code", { email: email }).then(function (r) {
+      if (!r.ok && r.error !== "wait") { msg(f, "Couldn't send a code. Try again in a minute."); return; }
+      pending = email; setItem("ta_ops_email", email); $("[data-sent-to]").textContent = email;
+      fe.hidden = true; fc.hidden = false; msg(fc, ""); $("#s-code").value = ""; $("#s-code").focus();
+    }, function () { msg(f, "Couldn't reach the server."); });
+  }
+  fe.addEventListener("submit", function (e) { e.preventDefault(); var em = fe.elements.email.value.trim().toLowerCase(); if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return msg(fe, "That email doesn't look right."); request(em, fe); });
+  fc.addEventListener("submit", function (e) {
+    e.preventDefault();
+    api("verify", { email: pending, code: fc.elements.code.value.replace(/\D/g, "") }).then(function (r) {
+      if (!r.ok) return msg(fc, r.error === "expired" ? "That code has expired. Send a new one." : "That code isn't right.");
+      if (!r.admin) { view("denied"); return; }
+      setItem(AUTH, JSON.stringify({ token: r.token, email: r.email })); start();
+    }, function () { msg(fc, "Couldn't reach the server."); });
+  });
+  fc.elements.code.addEventListener("input", function () { var v = fc.elements.code.value.replace(/\D/g, "").slice(0, 6); fc.elements.code.value = v; if (v.length === 6) fc.requestSubmit(); });
+  $("[data-change-email]").addEventListener("click", function () { fc.hidden = true; fe.hidden = false; });
+  $("[data-resend]").addEventListener("click", function () { request(pending, fc); });
+  function signin() { view("signin"); $("[data-signout]").hidden = true; fe.elements.email.value = getItem("ta_ops_email") || ""; fe.hidden = false; fc.hidden = true; }
+  $("[data-signout]").addEventListener("click", function () { delItem(AUTH); signin(); });
+
+  /* ---------- tooltip ---------- */
+  var tip = $("[data-tip]");
+  function showTip(x, y, value, sub) {
+    tip.innerHTML = ""; tip.appendChild(el("b", null, value)); tip.appendChild(el("span", null, sub)); tip.hidden = false;
+    var w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, x - w / 2)) + "px";
+    tip.style.top = Math.max(8, y - h - 12) + "px";
+  }
+  function hideTip() { tip.hidden = true; }
+
+  /* ---------- column chart: one series, one axis, hover per column, data table ---------- */
+  var NS = "http://www.w3.org/2000/svg";
+  function svgEl(tag, attrs) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+  function niceMax(m) { if (m <= 0) return 1; var p = Math.pow(10, Math.floor(Math.log10(m))), f = m / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p; }
+  function chart(box, title, days, values, fmt, unit) {
+    var wrap = el("div", "chart"), h3 = el("h3", null, title), total = el("span", null, "");
+    h3.appendChild(total); wrap.appendChild(h3);
+    var plot = el("div", "plot"); wrap.appendChild(plot);
+    var det = el("details"); det.appendChild(el("summary", null, "Data table"));
+    var tbl = el("table"), tb = el("tbody");
+    days.slice().reverse().forEach(function (d, i) { var v = values[days.length - 1 - i]; if (!v) return; var tr = el("tr"); tr.appendChild(el("td", null, dlabel(d))); tr.appendChild(el("td", null, fmt(v))); tb.appendChild(tr); });
+    if (!tb.children.length) { var tr0 = el("tr"); tr0.appendChild(el("td", null, "No " + unit + " in the last 30 days")); tb.appendChild(tr0); }
+    tbl.appendChild(tb); det.appendChild(tbl); wrap.appendChild(det);
+    total.textContent = fmt(sum(values)) + " in 30 days";
+    box.appendChild(wrap);
+    function draw() {
+      var W = plot.clientWidth, H = plot.clientHeight; if (!W) return;
+      plot.innerHTML = "";
+      var L = 38, R = 4, T = 8, B = 22, iw = W - L - R, ih = H - T - B;
+      var max = niceMax(Math.max.apply(null, values.concat([0])));
+      if (fmt === num && max % 2) max = max < 2 ? 2 : max + 1;   // counts: whole-number midpoint tick (0 / 3 / 6, not 0 / 2.5 / 5)
+      var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": title + ", last 30 days, " + fmt(sum(values)) + " total" });
+      [0, .5, 1].forEach(function (f) {
+        var y = T + ih - ih * f;
+        svg.appendChild(svgEl("line", { x1: L, x2: W - R, y1: y, y2: y, stroke: f === 0 ? "var(--axis)" : "var(--grid)", "stroke-width": 1, "shape-rendering": "crispEdges" }));
+        var t = svgEl("text", { x: L - 6, y: y + 3.5, "text-anchor": "end", class: "tick" }); t.textContent = fmt(max * f); svg.appendChild(t);
+      });
+      var band = iw / values.length, bw = Math.max(2, Math.min(24, band - 2));
+      values.forEach(function (v, i) {
+        var x = L + i * band + (band - bw) / 2, hgt = max ? v / max * ih : 0, y = T + ih - hgt;
+        if (v > 0) {
+          var r = Math.min(4, bw / 2, hgt);
+          svg.appendChild(svgEl("path", { fill: "var(--series-1)", d: "M" + x + "," + (T + ih) + "V" + (y + r) + "Q" + x + "," + y + " " + (x + r) + "," + y + "H" + (x + bw - r) + "Q" + (x + bw) + "," + y + " " + (x + bw) + "," + (y + r) + "V" + (T + ih) + "Z" }));
+        }
+        var hit = svgEl("rect", { x: L + i * band, y: T, width: band, height: ih, fill: "transparent", tabindex: 0, "aria-label": dlabel(days[i]) + ": " + fmt(v) });
+        function on(e) { var bb = hit.getBoundingClientRect(); showTip(bb.left + bb.width / 2, (e && e.type === "pointermove" ? e.clientY : bb.top + 20), fmt(v), dlabel(days[i])); }
+        hit.addEventListener("pointermove", on); hit.addEventListener("focus", on);
+        hit.addEventListener("pointerleave", hideTip); hit.addEventListener("blur", hideTip);
+        svg.appendChild(hit);
+      });
+      [0, Math.floor(values.length / 2), values.length - 1].forEach(function (i, n) {
+        var t = svgEl("text", { x: L + i * band + band / 2, y: H - 5, "text-anchor": n === 0 ? "start" : n === 2 ? "end" : "middle", class: "tick" });
+        if (n === 0) t.setAttribute("x", L); if (n === 2) t.setAttribute("x", W - R);
+        t.textContent = dlabel(days[i]); svg.appendChild(t);
+      });
+      plot.appendChild(svg);
+    }
+    charts.push(draw);
+    return draw;
+  }
+  var charts = [];
+  var ro = window.ResizeObserver ? new ResizeObserver(function () { charts.forEach(function (d) { d(); }); }) : null;
+  window.addEventListener("resize", function () { charts.forEach(function (d) { d(); }); });
+
+  function tile(box, label, value, sub) {
+    var t = el("div", "tile"); t.appendChild(el("small", null, label)); t.appendChild(el("b", null, value));
+    if (sub) t.appendChild(el("em", null, sub)); box.appendChild(t);
+  }
+  var ICON = {
+    critical: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="var(--critical)"/><path d="M5.5 5.5l5 5m0-5l-5 5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>',
+    warning: '<svg viewBox="0 0 16 16"><path d="M8 1.5 15 14H1z" fill="var(--warning)"/><path d="M8 6v3.6" stroke="#0a0f1e" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="11.7" r=".95" fill="#0a0f1e"/></svg>',
+    good: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="var(--good)"/><path d="m5 8.2 2 2 4-4.4" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    info: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="none" stroke="var(--info)" stroke-width="1.5"/><path d="M8 7.2v4" stroke="var(--muted)" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="4.9" r=".95" fill="var(--muted)"/></svg>'
+  };
+  function flagList(flags) {
+    var box = el("div", "flags");
+    if (!flags.length) { box.appendChild(el("span", "ok-line", "On track")); return box; }
+    flags.forEach(function (f) { var s = el("span", "flag"); s.innerHTML = ICON[f.level] || ""; s.appendChild(document.createTextNode(f.text)); box.appendChild(s); });
+    return box;
+  }
+
+  /* ---------- collapsible sections: content is built on first open, rebuilt on refresh if open ---------- */
+  function wireSection(sec, key, defaultOpen, build) {
+    var bar = $(".bar", sec), body = $(".body", sec), map = openMap();
+    sec._build = build; sec._built = false; sec._open = key in map ? map[key] : defaultOpen;
+    sec._set = function (o, save) {
+      sec._open = o; sec.classList.toggle("open", o); body.hidden = !o; bar.setAttribute("aria-expanded", String(o));
+      if (o && !sec._built) { sec._built = true; body.innerHTML = ""; sec._build(body); }
+      if (save) { var m = openMap(); m[key] = o; setItem(OPEN, JSON.stringify(m)); }
+      if (o) setTimeout(function () { charts.forEach(function (d) { d(); }); }, 0);
+    };
+    bar.addEventListener("click", function () { sec._set(!sec._open, true); });
+    sec._set(sec._open, false);
+  }
+  function rebuild(sec, build) { sec._build = build; sec._built = false; $(".body", sec).innerHTML = ""; sec._set(sec._open, false); }
+
+  /* ---------- render ---------- */
+  var data = null;
+  function render(d) {
+    data = d; charts = []; hideTip();
+    $("[data-updated]").textContent = "Numbers from " + ago(d.generated_at) + " · refreshes every 15 minutes";
+    var days = d.days, us = d.us;
+
+    // our account
+    var spend = sum(us.spend), leads = sum(us.leads), won = sum(us.clients_won), booked = us.booked ? sum(us.booked) : null;
+    var sumBox = $("[data-us-summary]"); sumBox.innerHTML = "";
+    [["Spend", money(spend)], ["Leads", num(leads)], ["Cost per lead", leads ? money(spend / leads, true) : "—"], ["Calls booked", num(booked)], ["Clients won", num(won)]]
+      .forEach(function (p) { var s = el("span"); s.appendChild(el("b", null, p[1])); s.appendChild(document.createTextNode(" " + p[0].toLowerCase())); sumBox.appendChild(s); });
+    var usSec = $('[data-sec="us"]');
+    var usBuilt = function (body) {
+      var tiles = el("div", "tiles"); body.appendChild(tiles);
+      tile(tiles, "Ad spend", money(spend), "act_" + us.ad_account);
+      tile(tiles, "Leads (Meta count)", num(leads), "GHL contacts are the true count");
+      tile(tiles, "Cost per lead", leads ? money(spend / leads, true) : "—");
+      tile(tiles, "Strategy calls booked", num(booked), booked == null ? "GHL not connected" : us.upcoming + " upcoming");
+      tile(tiles, "Show rate", pct(us.showed, us.showed + us.no_show), us.showed + " showed · " + us.no_show + " no-show");
+      tile(tiles, "Clients won", num(won), "from onboarding sign-ups");
+      tile(tiles, "Cost per client", won ? money(spend / won) : "—", "ad spend ÷ clients won");
+      tile(tiles, "Fees signed", money(us.fees_won), "service fees of clients won");
+      var ch = el("div", "charts"); ch.style.setProperty("--n", us.booked ? 3 : 2); body.appendChild(ch);
+      chart(ch, "Leads per day", days, us.leads, num, "leads");
+      chart(ch, "Ad spend per day", days, us.spend, function (v) { return money(v); }, "spend");
+      if (us.booked) chart(ch, "Calls booked per day", days, us.booked, num, "calls");
+      if (us.errors && us.errors.length) { var n = el("p", "note"); n.appendChild(el("b", null, "Not connected: ")); n.appendChild(document.createTextNode(us.errors.join(" · "))); body.appendChild(n); }
+      observe(body);
+    };
+    if (!usSec._set) wireSection(usSec, "us", true, usBuilt); else rebuild(usSec, usBuilt);
+
+    // clients
+    var cs = d.clients || [], list = $("[data-clients]"); list.innerHTML = "";
+    var crit = cs.filter(function (c) { return c.flags.some(function (f) { return f.level === "critical" || f.level === "warning"; }); }).length;
+    $("[data-clients-sum]").textContent = cs.length + " active · " + crit + " need attention · " + num(sum(cs.map(function (c) { return c.leads_today; }))) + " leads today";
+    if (!cs.length) { var em = el("div", "card empty", "No active clients yet. They appear here once they finish onboarding."); list.appendChild(em); return; }
+    cs.forEach(function (c) { list.appendChild(clientCard(c, days)); });
+  }
+  function observe(node) { if (ro) $$(".plot", node).forEach(function (p) { ro.observe(p); }); }
+
+  function clientCard(c, days) {
+    var sec = el("div", "card sec");
+    var bar = el("button", "bar"); bar.type = "button";
+    var row = el("div", "crow");
+    var nm = el("div", "nm"); nm.appendChild(el("b", null, c.business));
+    var pkg = c.term_days ? (c.term_days === 14 ? "2-week starter" : c.term_days + "-day package") + " · " + money(c.total) + " total" : "No package on file";
+    nm.appendChild(el("span", null, pkg)); row.appendChild(nm);
+    function k(label, value) { var d = el("div", "k"); d.appendChild(el("b", null, value)); d.appendChild(el("span", null, label)); row.appendChild(d); }
+    k(c.day ? (c.day > c.term_days ? "term ended" : "of " + c.term_days + " days") : "not launched", c.day ? "Day " + Math.min(c.day, c.term_days || c.day) : "—");
+    k("leads in term", num(c.leads_term));
+    k("CPL (target " + money(c.target_cpl) + ")", c.spend !== null && c.leads_term ? money(c.spend_term / c.leads_term, true) : "—");
+    var sold = el("div", "sold k");
+    sold.appendChild(el("b", null, money(c.sold) + " sold"));
+    sold.appendChild(el("span", null, "of " + money(c.total) + " total spend"));
+    var m = el("div", "meter"), mi = el("i"); mi.style.width = Math.min(100, c.total ? c.sold / c.total * 100 : 0) + "%"; if (c.sold > c.total) mi.className = "win";
+    m.setAttribute("role", "meter"); m.setAttribute("aria-valuemin", 0); m.setAttribute("aria-valuemax", c.total); m.setAttribute("aria-valuenow", c.sold);
+    m.appendChild(mi); sold.appendChild(m); row.appendChild(sold);
+    row.appendChild(flagList(c.flags));
+    bar.appendChild(row);
+    var chev = el("span", "chev"); chev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
+    bar.appendChild(chev);
+    sec.appendChild(bar);
+    var body = el("div", "body"); sec.appendChild(body);
+    wireSection(sec, "c:" + c.email, false, function (b) {
+      var tiles = el("div", "tiles"); b.appendChild(tiles);
+      tile(tiles, "Leads today", num(c.leads_today), "last lead " + ago(c.last_lead));
+      tile(tiles, "Leads, last 7 days", num(c.leads_7d));
+      var expected = c.term_days && c.day ? c.ad_spend / c.term_days * Math.min(c.day, c.term_days) : 0;
+      tile(tiles, "Spend in term", c.spend === null ? "—" : money(c.spend_term), c.spend === null ? "ad account not connected" : expected ? "planned by today: " + money(expected) : "");
+      tile(tiles, "Jobs sold · quoted", c.jobs_sold + " · " + c.quoted, money(c.sold) + " sold value");
+      var ch = el("div", "charts"); b.appendChild(ch);
+      chart(ch, "Leads per day", days, c.leads, num, "leads");
+      if (c.spend) chart(ch, "Ad spend per day", days, c.spend, function (v) { return money(v); }, "spend");
+      var f = el("div", "foot-line");
+      f.appendChild(el("span", null, "Lead sync: " + (c.sync_status || "not set up")));
+      f.appendChild(el("span", null, "Launched: " + (c.launch_date ? dlabel(c.launch_date) : "not yet")));
+      f.appendChild(el("span", null, c.email));
+      if (c.sheet_url) { var a = el("a", null, "Leads sheet"); a.href = c.sheet_url; a.target = "_blank"; a.rel = "noopener"; f.appendChild(a); }
+      b.appendChild(f);
+      observe(b);
+      charts.forEach(function (d) { d(); });
+    });
+    return sec;
+  }
+
+  $$("[data-all]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var o = b.getAttribute("data-all") === "open";
+      $$("[data-clients] .sec").forEach(function (s) { if (s._set) s._set(o, true); });
+    });
+  });
+
+  function load(refresh) {
+    var a = auth(); if (!a) { signin(); return Promise.resolve(); }
+    $("[data-refresh]").disabled = true; $("[data-refresh]").textContent = refresh ? "Refreshing…" : "Refresh";
+    return api("ops", { token: a.token, refresh: !!refresh }).then(function (r) {
+      $("[data-refresh]").disabled = false; $("[data-refresh]").textContent = "Refresh";
+      if (!r.ok) { if (r.error === "signed_out") { delItem(AUTH); signin(); } else $("[data-updated]").textContent = "Couldn't load. Try Refresh in a minute."; return; }
+      view("dash"); $("[data-signout]").hidden = false; $("[data-who]").textContent = r.email;
+      render(r);
+    }, function () { $("[data-refresh]").disabled = false; $("[data-refresh]").textContent = "Refresh"; });
+  }
+  function start() { view("loading"); load(false); }
+  $("[data-refresh]").addEventListener("click", function () { load(true); });
+  setInterval(function () { if (!document.hidden && auth() && data) load(false); }, 5 * 60 * 1000);
+
+  if (!API) { view("offline"); return; }
+  if (auth()) start(); else signin();
+})();
+</script>
+</body>
+</html>
