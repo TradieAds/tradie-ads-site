@@ -230,6 +230,21 @@
   .choices.row { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
   .certs { display: grid; gap: 8px; margin-top: 14px; }
   .certs .check { margin: 0; }
+  .drop { display: block; position: relative; margin-top: 18px; border: 2px dashed var(--field); border-radius: 14px; padding: 26px 16px; text-align: center; cursor: pointer; background: #f8faff; transition: border-color .15s, background .15s; }
+  .drop:hover, .drop.over { border-color: var(--blue); background: #eef3ff; }
+  .drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .drop-in { color: var(--ink); font-size: 15px; }
+  .drop-in b { color: var(--blue); }
+  .drop-in small { display: block; color: var(--soft); font-size: 12.5px; margin-top: 4px; }
+  .logo-prev { display: flex; align-items: center; gap: 14px; margin-top: 14px; border: 1.5px solid var(--field); border-radius: 14px; padding: 10px 12px; }
+  .logo-box { flex: none; width: 96px; height: 72px; border-radius: 10px; display: grid; place-items: center; padding: 6px;
+    background: repeating-conic-gradient(#e7ebf3 0% 25%, #fff 0% 50%) 50% / 14px 14px; }
+  .logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+  .logo-meta { flex: 1; min-width: 0; display: grid; gap: 2px; font-size: 13.5px; color: var(--muted); }
+  .logo-meta b { color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .logo-hint { font-size: 12.5px; }
+  .logo-hint.ok { color: #0a7a0a; }
+  .link-btn { background: none; border: 0; color: var(--blue); font: 600 14px Inter, sans-serif; cursor: pointer; flex: none; }
   .q .row-x { margin-top: 16px; }
   .q-nav { display: flex; align-items: center; gap: 14px; margin-top: 22px; flex-wrap: wrap; }
   .q-nav .q-ok { min-height: 48px; padding: 0 22px; width: auto; }
@@ -360,7 +375,7 @@
 
     <!-- ============ STEP 4: about your business (one question at a time) ============ -->
     <section data-step="area" hidden>
-      <div class="head"><h1>Step 4: Tell us about your business</h1><p>Watch the video, then answer 9 quick questions below. It takes about 3 minutes and means we can hit the ground running on your onboarding call.</p></div>
+      <div class="head"><h1>Step 4: Tell us about your business</h1><p>Watch the video, then answer 10 quick questions below. It takes about 3 minutes and means we can hit the ground running on your onboarding call.</p></div>
       <div class="video" data-video="area"></div>
       <form class="card quiz" data-form="area" novalidate>
         <div class="q-top"><span data-q-count>Question 1 of 6</span><div class="q-bar"><i data-q-bar></i></div></div>
@@ -431,6 +446,21 @@
           <div class="choices row" data-choices="install_time" data-stay><button type="button">One visit</button><button type="button">1–2 days</button><button type="button">Longer</button></div>
           <p class="q-label">Do you offer financing?</p>
           <div class="choices row" data-choices="financing" data-stay><button type="button">Yes</button><button type="button">No</button></div>
+        </div>
+
+        <div class="q" data-q="logo" hidden>
+          <h2><span class="q-n"></span> Upload your logo</h2>
+          <p class="q-sub">We'll put it on your ads. A PNG or SVG with a <b>transparent background</b> looks cleanest, but upload whatever you have.</p>
+          <label class="drop" data-drop>
+            <input type="file" accept="image/png,image/svg+xml,image/jpeg,image/webp" data-logo-file>
+            <span class="drop-in"><b>Choose a file</b> or drag it here<small>PNG, SVG, JPG or WEBP · up to 5 MB</small></span>
+          </label>
+          <div class="logo-prev" data-logo-prev hidden>
+            <span class="logo-box"><img alt="Your logo" data-logo-img></span>
+            <span class="logo-meta"><b data-logo-name></b><span data-logo-status></span><span class="logo-hint" data-logo-hint></span></span>
+            <button type="button" class="link-btn" data-logo-clear>Remove</button>
+          </div>
+          <label class="check q-check"><input type="checkbox" name="no_logo"> <span>We don't have a logo</span></label>
         </div>
 
         <div class="q" data-q="area" hidden>
@@ -806,6 +836,7 @@ var CONFIG = {
     body.set("licensed_insured", pf.licensed || "");
     body.set("certifications", (pf.certs || []).concat(pf.certs_other ? [pf.certs_other] : []).join(", "));
     body.set("permits", pf.permits || ""); body.set("install_time", pf.install_time || ""); body.set("financing", pf.financing || "");
+    body.set("logo_url", pf.logo_url || ""); body.set("logo_transparent", pf.logo_transparent === true ? "yes" : pf.logo_transparent === false ? "no" : "");
     var pk = plan();
     body.set("package", pk ? pk.label : ""); body.set("service_fee", pk ? pk.fee : ""); body.set("ad_spend", pk ? pk.spend : "");
     body.set("term_days", pk ? pk.days : ""); body.set("total_spend", pk ? pk.total : "");
@@ -1173,6 +1204,79 @@ var CONFIG = {
     });
   });
   $$("[data-q] .q-n", fa).forEach(function (n, i) { n.textContent = (i + 1) + " →"; });
+
+  // ---- logo upload: straight to the dashboard backend (saved in our Drive, link in the Clients sheet) ----
+  var logoFile = $("[data-logo-file]"), drop = $("[data-drop]"), logoBusy = false;
+  function logoUI() {
+    var P = state.profile, has = !!(P.logo_url || P.logo_preview);
+    $("[data-logo-prev]").hidden = !has; drop.hidden = has;
+    if (has) {
+      $("[data-logo-img]").src = P.logo_preview || "";
+      $("[data-logo-img]").parentNode.hidden = !P.logo_preview;
+      $("[data-logo-name]").textContent = P.logo_name || "Your logo";
+      $("[data-logo-status]").textContent = logoBusy ? "Uploading…" : P.logo_url ? "Uploaded ✓" : "Not uploaded yet";
+      var h = $("[data-logo-hint]");
+      h.textContent = P.logo_transparent === true ? "Transparent background ✓" : P.logo_transparent === false ? "Solid background. That's fine: we'll put it on a white badge. If you have a transparent version, upload that instead." : "";
+      h.className = "logo-hint" + (P.logo_transparent === true ? " ok" : "");
+    }
+    fa.elements.no_logo.checked = !!P.no_logo;
+  }
+  function hasAlpha(dataUrl, type) {
+    return new Promise(function (ok) {
+      if (type === "image/svg+xml") return ok(true);
+      if (type === "image/jpeg") return ok(false);
+      var img = new Image();
+      img.onload = function () {
+        try {
+          var w = Math.min(img.width, 400), h = Math.round(img.height * w / img.width) || 1, c = document.createElement("canvas");
+          c.width = w; c.height = h; var x = c.getContext("2d"); x.drawImage(img, 0, 0, w, h);
+          var d = x.getImageData(0, 0, w, h).data;
+          for (var i = 3; i < d.length; i += 16) if (d[i] < 250) return ok(true);
+          ok(false);
+        } catch (e) { ok(null); }
+      };
+      img.onerror = function () { ok(null); }; img.src = dataUrl;
+    });
+  }
+  function takeLogo(file) {
+    if (!file) return;
+    var okType = /^image\/(png|svg\+xml|jpeg|webp)$/.test(file.type);
+    if (!okType) { qError("That file type won't work. Upload a PNG, SVG, JPG or WEBP."); return; }
+    if (file.size > 5 * 1024 * 1024) { qError("That file is over 5 MB. Export a smaller version and try again."); return; }
+    qError("");
+    var rd = new FileReader();
+    rd.onload = function () {
+      var dataUrl = String(rd.result), P = state.profile;
+      P.logo_name = file.name; P.logo_url = ""; P.no_logo = false;
+      P.logo_preview = dataUrl.length < 400000 ? dataUrl : "";   // small enough to keep for the preview on reload
+      logoBusy = true; logoUI();
+      var previewNow = dataUrl; $("[data-logo-img]").src = previewNow; $("[data-logo-img]").parentNode.hidden = false;
+      hasAlpha(dataUrl, file.type).then(function (t) { P.logo_transparent = t; save(); logoUI(); $("[data-logo-img]").src = previewNow; });
+      if (!LEADS_API) { logoBusy = false; logoUI(); return; }
+      fetch(LEADS_API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "logo", email: state.data.email, name: file.name, mime: file.type, data: dataUrl.split(",")[1] }) })
+        .then(function (r) { return r.json(); })
+        .then(function (r) {
+          logoBusy = false;
+          if (r && r.ok) { P.logo_url = r.url; save(); }
+          else qError(r && r.error === "too_big" ? "That file is over 5 MB." : "The upload didn't go through. Try again, or skip this and email your logo to admin@tradie-ads.com.");
+          logoUI(); $("[data-logo-img]").src = previewNow;
+        }, function () { logoBusy = false; qError("The upload didn't go through. Check your connection and try again."); logoUI(); $("[data-logo-img]").src = previewNow; });
+    };
+    rd.readAsDataURL(file);
+  }
+  logoFile.addEventListener("change", function () { takeLogo(logoFile.files[0]); logoFile.value = ""; });
+  ["dragenter", "dragover"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("over"); }); });
+  ["dragleave", "drop"].forEach(function (ev) { drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("over"); }); });
+  drop.addEventListener("drop", function (e) { takeLogo(e.dataTransfer && e.dataTransfer.files[0]); });
+  $("[data-logo-clear]").addEventListener("click", function () {
+    var P = state.profile; ["logo_url", "logo_name", "logo_preview", "logo_transparent"].forEach(function (k) { delete P[k]; }); save(); logoUI();
+  });
+  fa.elements.no_logo.addEventListener("change", function () {
+    state.profile.no_logo = fa.elements.no_logo.checked; save(); qError("");
+    if (state.profile.no_logo && !state.profile.logo_url) setTimeout(function () { nextQ(); }, 280);
+  });
+  logoUI();
   $$("[data-choices]", fa).forEach(function (box) {
     var k = box.getAttribute("data-choices");
     $$("button", box).forEach(function (b, i) {
@@ -1213,6 +1317,10 @@ var CONFIG = {
       return !!p.years_in_business || "How many years have you been in business?";
     }
     if (k === "creds") return !!p.licensed || "Pick one to continue.";
+    if (k === "logo") {
+      if (logoBusy) return "Your logo is still uploading. One moment…";
+      return !!(p.logo_url || p.no_logo) || "Upload your logo, or tick \"We don't have a logo\".";
+    }
     if (k === "work") return !!(p.permits && p.install_time && p.financing) || "Answer all three to continue.";
     if (k === "area") return !!(state.target.lat && state.target.lng) || "Drop a pin on the map: click where you want your ads centered, or search your address.";
     return !!p[k] || "Pick one to continue.";
@@ -1317,7 +1425,8 @@ var CONFIG = {
         google_rating: P.no_reviews ? "" : P.google_rating || "", google_reviews: P.no_reviews ? "0" : P.google_reviews || "",
         years_in_business: P.years_in_business || "", warranty: P.warranty || "", licensed: P.licensed || "",
         certifications: (P.certs || []).concat(P.certs_other ? [P.certs_other] : []).join(", "),
-        permits: P.permits || "", install_time: P.install_time || "", financing: P.financing || "" }) })
+        permits: P.permits || "", install_time: P.install_time || "", financing: P.financing || "",
+        logo_transparent: P.logo_transparent === true ? "yes" : P.logo_transparent === false ? "no" : "" }) })
       .then(function (r) { return r.json(); })
       .then(function (r) { if (r && r.error === "no_account" && !retried) { registerAccount(); setTimeout(function () { saveProfile(true); }, 5000); } })
       .catch(function () {});

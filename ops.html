@@ -554,6 +554,12 @@
     tile(tiles2, "How they work", p.install_time || "—", [p.permits, p.financing ? "financing: " + p.financing : ""].filter(Boolean).join(" · "));
     $$(".tile b", tiles2).forEach(function (b) { b.style.fontSize = "17px"; });
     blk.appendChild(tiles2);
+    if (p.logo) {
+      var m = /\/d\/([\w-]+)/.exec(p.logo), lg = el("div", "soft-note"); lg.style.marginTop = "10px"; lg.style.display = "flex"; lg.style.alignItems = "center"; lg.style.gap = "12px";
+      if (m) { var im = el("img"); im.src = "https://drive.google.com/thumbnail?id=" + m[1] + "&sz=w240"; im.alt = "Logo"; im.style.maxHeight = "48px"; im.style.maxWidth = "160px"; im.referrerPolicy = "no-referrer"; im.onerror = function () { im.remove(); }; lg.appendChild(im); }
+      var la = el("a", null, "Logo" + (p.logo_transparent === "yes" ? " (transparent)" : p.logo_transparent === "no" ? " (solid background)" : "")); la.href = p.logo; la.target = "_blank"; la.rel = "noopener";
+      lg.appendChild(la); blk.appendChild(lg);
+    }
     if (p.offer) { var o = el("p", "soft-note"); o.style.marginTop = "10px"; o.appendChild(el("b", null, "Agreed offer: ")); o.appendChild(document.createTextNode(p.offer)); blk.appendChild(o); }
     if (p.constraint) { var n = el("p", "soft-note"); n.style.marginTop = "10px"; n.appendChild(el("b", null, "Biggest constraint: ")); n.appendChild(document.createTextNode(p.constraint)); blk.appendChild(n); }
     box.appendChild(blk);
