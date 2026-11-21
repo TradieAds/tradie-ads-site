@@ -547,6 +547,14 @@
     tile(tiles, "New jobs per week", p.capacity || "—");
     $$(".tile b", tiles).forEach(function (b) { b.style.fontSize = "17px"; });
     blk.appendChild(tiles);
+    var tiles2 = el("div", "tiles"); tiles2.style.marginTop = "10px";
+    tile(tiles2, "Google reviews", p.rating ? p.rating + " ★" : "—", p.rating ? (p.reviews || "?") + " reviews" : (has ? "none yet" : ""));
+    tile(tiles2, "Licence", p.licensed || "—", p.certs || "");
+    tile(tiles2, "Experience", p.years ? p.years + " years" : "—", p.warranty ? "warranty: " + p.warranty : "");
+    tile(tiles2, "How they work", p.install_time || "—", [p.permits, p.financing ? "financing: " + p.financing : ""].filter(Boolean).join(" · "));
+    $$(".tile b", tiles2).forEach(function (b) { b.style.fontSize = "17px"; });
+    blk.appendChild(tiles2);
+    if (p.offer) { var o = el("p", "soft-note"); o.style.marginTop = "10px"; o.appendChild(el("b", null, "Agreed offer: ")); o.appendChild(document.createTextNode(p.offer)); blk.appendChild(o); }
     if (p.constraint) { var n = el("p", "soft-note"); n.style.marginTop = "10px"; n.appendChild(el("b", null, "Biggest constraint: ")); n.appendChild(document.createTextNode(p.constraint)); blk.appendChild(n); }
     box.appendChild(blk);
   }
