@@ -10,6 +10,7 @@
 <meta name="theme-color" content="#070b14">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800;900&family=Dancing+Script:wght@600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -187,6 +188,44 @@
   select, textarea { width: 100%; border: 1.5px solid var(--field); border-radius: 12px; padding: 12px 14px; font: 400 16px Inter, sans-serif; color: var(--ink); background: #fff; }
   select { height: 50px; padding: 0 12px; }
   textarea { min-height: 84px; resize: vertical; }
+  /* Step 4: target area */
+  .find { flex: none; height: 50px; padding: 0 18px; border-radius: 12px; border: 0; background: var(--blue); color: #fff; font: 700 15px Inter, sans-serif; cursor: pointer; }
+  .find:hover { background: var(--blue-dark); }
+  .find[disabled] { opacity: .6; cursor: wait; }
+  .tmap { height: 300px; margin-top: 14px; border-radius: 14px; border: 1.5px solid var(--field); background: #f3f6fc; overflow: hidden; position: relative; z-index: 0; }
+  .tmap-ph { height: 100%; display: grid; place-items: center; text-align: center; padding: 18px; color: var(--muted); font-size: 14px; }
+  .range { width: 100%; accent-color: var(--blue); margin-top: 6px; height: 28px; }
+  .range-ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--soft); }
+  label.f .opt { color: var(--soft); font-weight: 500; }
+  label.f [data-radius-out] { color: var(--blue); }
+  .quiz { padding-bottom: 18px; }
+  .q-top { display: flex; align-items: center; gap: 12px; font-size: 12.5px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 18px; }
+  .q-bar { flex: 1; height: 6px; border-radius: 99px; background: #e6ebf5; overflow: hidden; }
+  .q-bar i { display: block; height: 100%; width: 0; background: var(--blue); border-radius: 99px; transition: width .35s ease; }
+  .q h2 { font: 800 clamp(21px, 3.4vw, 26px)/1.25 Archivo, Inter, sans-serif; color: var(--ink); letter-spacing: -.01em; }
+  .q-n { color: var(--blue); font-size: .8em; margin-right: 4px; }
+  .q-sub { color: var(--muted); font-size: 15px; margin: 8px 0 0; }
+  .q-in { animation: q-in .35s ease both; }
+  @keyframes q-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .q-in { animation: none; } .q-bar i { transition: none; } }
+  .q-prices { display: grid; gap: 10px; margin-top: 18px; }
+  .q-price { display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1.5px solid var(--field); border-radius: 12px; padding: 8px 8px 8px 14px; font-weight: 600; color: var(--ink); }
+  .q-price .money { display: flex; align-items: center; gap: 4px; color: var(--muted); }
+  .q-price .money i { font-style: normal; font-weight: 700; }
+  .q-price input { width: 130px; height: 42px; text-align: right; font-weight: 700; }
+  .choices { display: grid; gap: 10px; margin-top: 18px; }
+  .choices button { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; min-height: 52px; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--field); background: #fff; color: var(--ink); font: 600 16px Inter, sans-serif; cursor: pointer; transition: border-color .12s, background .12s; }
+  .choices button:hover { border-color: var(--blue); background: #f4f7ff; }
+  .choices button[aria-pressed="true"] { border-color: var(--blue); background: #eaf0ff; box-shadow: 0 0 0 3px rgba(31,94,255,.15); }
+  .choices .key { flex: none; width: 26px; height: 26px; border-radius: 7px; border: 1.5px solid var(--field); display: grid; place-items: center; font: 700 12.5px Inter, sans-serif; color: var(--muted); background: #fff; }
+  .choices button[aria-pressed="true"] .key { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .q-note { margin-top: 12px; }
+  .q .row-x { margin-top: 16px; }
+  .q-nav { display: flex; align-items: center; gap: 14px; margin-top: 22px; flex-wrap: wrap; }
+  .q-nav .q-ok { min-height: 48px; padding: 0 22px; width: auto; }
+  .q-back { background: none; border: 0; color: var(--muted); font: 600 14px Inter, sans-serif; cursor: pointer; padding: 8px 0; }
+  .q-hint { font-size: 13px; color: var(--soft); }
+  @media (max-width: 640px) { .q-hint { display: none; } .q-nav .q-ok { flex: 1; } }
   select:focus, textarea:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(31,94,255,.15); }
   .form-title { font: 800 18px/1.2 Archivo, sans-serif; color: var(--ink); margin: 22px 0 2px; }
   .scroll-hint { font-size: 13px; color: var(--muted); text-align: center; }
@@ -309,9 +348,72 @@
       <div class="cta"><button class="btn btn-glow" data-next>Continue to Step 4 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     </section>
 
-    <!-- ============ STEP 4 ============ -->
+    <!-- ============ STEP 4: about your business (one question at a time) ============ -->
+    <section data-step="area" hidden>
+      <div class="head"><h1>Step 4: Tell us about your business</h1><p>Watch the video, then answer 6 quick questions below. It takes about 2 minutes and means we can hit the ground running on your onboarding call.</p></div>
+      <div class="video" data-video="area"></div>
+      <form class="card quiz" data-form="area" novalidate>
+        <div class="q-top"><span data-q-count>Question 1 of 6</span><div class="q-bar"><i data-q-bar></i></div></div>
+
+        <div class="q" data-q="price">
+          <h2><span class="q-n">1 →</span> What do you charge for a basic install?</h2>
+          <p class="q-sub">A ballpark is fine. It tells us what a lead is worth to you. Leave blank anything you don't do.</p>
+          <div class="q-prices">
+            <label class="q-price"><span>EV charger install</span><span class="money"><i>$</i><input name="price_ev" inputmode="numeric" placeholder="1,200"></span></label>
+            <label class="q-price"><span>Panel upgrade</span><span class="money"><i>$</i><input name="price_panel" inputmode="numeric" placeholder="2,500"></span></label>
+            <label class="q-price"><span>Home generator</span><span class="money"><i>$</i><input name="price_gen" inputmode="numeric" placeholder="9,000"></span></label>
+          </div>
+        </div>
+
+        <div class="q" data-q="callback" hidden>
+          <h2><span class="q-n">2 →</span> When a new lead comes in, how fast does someone call them?</h2>
+          <p class="q-sub">Be honest. Speed to lead is the #1 thing we help fix.</p>
+          <div class="choices" data-choices="callback"><button type="button">Within 5 minutes</button><button type="button">Within an hour</button><button type="button">Same day</button><button type="button">Next day or later</button><button type="button">Not sure yet</button></div>
+        </div>
+
+        <div class="q" data-q="sales" hidden>
+          <h2><span class="q-n">3 →</span> Who calls your leads and sells the job?</h2>
+          <div class="choices" data-choices="sales"><button type="button">Me, the owner</button><button type="button">A salesperson or estimator</button><button type="button">Office staff or a dispatcher</button><button type="button">Nobody set up yet</button></div>
+        </div>
+
+        <div class="q" data-q="capacity" hidden>
+          <h2><span class="q-n">4 →</span> How many new jobs could you take on each week?</h2>
+          <div class="choices" data-choices="capacity"><button type="button">1 to 2</button><button type="button">3 to 5</button><button type="button">6 to 10</button><button type="button">More than 10</button></div>
+        </div>
+
+        <div class="q" data-q="constraint" hidden>
+          <h2><span class="q-n">5 →</span> What's holding your business back most right now?</h2>
+          <div class="choices" data-choices="constraint"><button type="button">Not enough leads</button><button type="button">Leads don't answer or go cold</button><button type="button">Turning quotes into sold jobs</button><button type="button">No time to follow up</button><button type="button">Something else</button></div>
+          <textarea name="constraint_note" class="q-note" placeholder="Anything else we should know? (optional)"></textarea>
+        </div>
+
+        <div class="q" data-q="area" hidden>
+          <h2><span class="q-n">6 →</span> Where should your ads show?</h2>
+          <p class="q-sub">Drop the pin on your shop or the middle of where you want work (click the map, drag the pin, or search an address), then set how far out to go.</p>
+          <div class="row-x"><input id="t-center" name="center" type="text" autocomplete="street-address" placeholder="Search an address or town"><button type="button" class="find" data-find>Find</button></div>
+          <div class="tmap" data-tmap><div class="tmap-ph">Loading map…</div></div>
+          <label class="f" for="t-radius">Radius: <b data-radius-out>25 miles</b></label>
+          <input id="t-radius" name="radius" type="range" class="range" min="15" max="60" step="1" value="25">
+          <div class="range-ends"><span>15 mi (narrower)</span><span>60 mi (wider)</span></div>
+          <p class="help">At least 15 miles (the guarantee needs it). Most electricians pick 20 to 30.</p>
+          <label class="f" for="t-include">Towns or ZIP codes you especially want <span class="opt">(optional)</span></label>
+          <textarea id="t-include" name="include" placeholder="e.g. Naperville, Wheaton, 60540"></textarea>
+          <label class="f" for="t-exclude">Areas to leave out <span class="opt">(optional)</span></label>
+          <textarea id="t-exclude" name="exclude" placeholder="e.g. downtown, anything across the river"></textarea>
+        </div>
+
+        <p class="err" data-err hidden></p>
+        <div class="q-nav">
+          <button type="button" class="q-back" data-q-back>← Back</button>
+          <button type="submit" class="btn btn-primary q-ok" data-q-next>OK ✓</button>
+          <span class="q-hint">or press <b>Enter ↵</b></span>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============ STEP 5 ============ -->
     <section data-step="leads" hidden>
-      <div class="head"><h1>Step 4: Tell us where to send leads</h1><p>Watch the video, then confirm where your leads should go.</p></div>
+      <div class="head"><h1>Step 5: Tell us where to send leads</h1><p>Watch the video, then confirm where your leads should go.</p></div>
       <form data-form="leads" novalidate>
       <div class="video" data-video="leads"></div>
       <div class="card">
@@ -332,9 +434,9 @@
       </form>
     </section>
 
-    <!-- ============ STEP 5 ============ -->
+    <!-- ============ STEP 6 ============ -->
     <section data-step="facebook" hidden>
-      <div class="head"><h1>Step 5: Connect your Facebook account</h1><p>Watch the video, then connect your Facebook Page and the ad account that has your credit card on it. Your ad spend is charged to that card.</p></div>
+      <div class="head"><h1>Step 6: Connect your Facebook account</h1><p>Watch the video, then connect your Facebook Page and the ad account that has your credit card on it. Your ad spend is charged to that card.</p></div>
       <div class="video" data-video="facebook"></div>
       <div class="card">
         <a class="btn btn-outline btn-block" href="https://business.facebook.com/settings/partners" target="_blank" rel="noopener">Open Business Settings <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></a>
@@ -354,12 +456,12 @@
 
         <label class="check"><input type="checkbox" data-gate="facebook"> I've connected my account or sent the partner access.</label>
       </div>
-      <div class="cta"><button class="btn btn-glow" data-next data-needs="facebook" disabled>Continue to Step 6 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+      <div class="cta"><button class="btn btn-glow" data-next data-needs="facebook" disabled>Continue to Step 7 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     </section>
 
-    <!-- ============ STEP 6 ============ -->
+    <!-- ============ STEP 7 ============ -->
     <section data-step="final" hidden>
-      <div class="head"><h1>Step 6: Final words</h1><p>Watch the video, then book your strategy session. It's the last step.</p></div>
+      <div class="head"><h1>Step 7: Final words</h1><p>Watch the video, then book your strategy session. It's the last step.</p></div>
       <div class="video" data-video="final"></div>
       <div class="cta"><button class="btn btn-glow" data-next>Book your strategy session <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     </section>
@@ -384,6 +486,10 @@
           <p class="help">Bookmark it. Every lead shows up here as it comes in, as well as by email and text.</p>
         </div>
         <p class="help" data-sheet-later>We'll email you the link to your leads spreadsheet before launch. Every lead shows up there as it comes in, as well as by email and text.</p>
+        <div style="margin-top:18px;display:grid;gap:10px">
+          <a class="btn btn-primary btn-block" data-done-dash href="leads.html">Open your leads dashboard</a>
+          <button type="button" class="btn btn-ghost btn-block" data-review style="color:var(--blue);border:1.5px solid var(--field)">Review the onboarding steps</button>
+        </div>
         <p style="color:var(--muted);margin-top:10px">Questions? Text <b>(650) 719-7145</b> or email <a href="mailto:admin@tradie-ads.com">admin@tradie-ads.com</a>.</p>
       </div>
     </section>
@@ -592,14 +698,15 @@ var CONFIG = {
     expect:    "assets/videos/expect.mp4",
     leads:     "assets/videos/leads.mp4",
     facebook:  "assets/videos/facebook.mp4",
-    final:     "assets/videos/final.mp4"
+    final:     "assets/videos/final.mp4",
+    area:      "https://www.loom.com/embed/78d4c5b60e9a41c8a9cb098d9f50cd26"
   }
 };
 /* ====================================================== */
 
 (function () {
-  var STEPS = ["start", "welcome", "agreement", "expect", "leads", "facebook", "final", "book", "done"];
-  var LABELS = { start: "Start", welcome: "Step 1 of 6", agreement: "Step 2 of 6", expect: "Step 3 of 6", leads: "Step 4 of 6", facebook: "Step 5 of 6", final: "Step 6 of 6", book: "Finish", done: "Done" };
+  var STEPS = ["start", "welcome", "agreement", "expect", "area", "leads", "facebook", "final", "book", "done"];
+  var LABELS = { start: "Start", welcome: "Step 1 of 7", agreement: "Step 2 of 7", expect: "Step 3 of 7", area: "Step 4 of 7", leads: "Step 5 of 7", facebook: "Step 6 of 7", final: "Step 7 of 7", book: "Finish", done: "Done" };
   var KEY = "tradieads-onboarding-v1";
   var $ = function (s, r) { return (r || document).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
@@ -641,6 +748,13 @@ var CONFIG = {
     body.set("lead_emails", (d.lead_emails || []).join(", ")); body.set("lead_phones", (d.lead_phones || []).join(", "));
     body.set("facebook_access_sent", state.gates && state.gates.facebook ? "yes" : "no");
     body.set("sheet_url", d.sheet || "");
+    var t = state.target || {};
+    body.set("target_center", t.center || ""); body.set("target_radius_mi", t.radius || ""); body.set("target_lat", t.lat || "");
+    body.set("target_lng", t.lng || ""); body.set("target_include", t.include || ""); body.set("target_exclude", t.exclude || "");
+    var pf = state.profile || {};
+    body.set("price_ev_install", pf.price_ev || ""); body.set("price_panel_upgrade", pf.price_panel || ""); body.set("price_generator", pf.price_gen || "");
+    body.set("lead_callback_speed", pf.callback || ""); body.set("who_sells", pf.sales || ""); body.set("weekly_capacity", pf.capacity || "");
+    body.set("biggest_constraint", [pf.constraint, pf.constraint_note].filter(Boolean).join(": "));
     var pk = plan();
     body.set("package", pk ? pk.label : ""); body.set("service_fee", pk ? pk.fee : ""); body.set("ad_spend", pk ? pk.spend : "");
     body.set("term_days", pk ? pk.days : ""); body.set("total_spend", pk ? pk.total : "");
@@ -667,10 +781,12 @@ var CONFIG = {
 
   // Progress bars
   var bars = $("[data-bars]");
-  for (var i = 0; i < 8; i++) bars.appendChild(document.createElement("span"));
+  for (var i = 0; i < STEPS.length - 1; i++) bars.appendChild(document.createElement("span"));
 
   // skim = true for the small Previous/Next links, which can move to any step (for reviewing the flow).
-  function show(step, skim) {
+  // boot = the first render on page load. Coming back to a finished onboarding shows the "done" card instead of
+  // bouncing straight to the leads sign-in.
+  function show(step, skim, boot) {
     if (STEPS.indexOf(step) < 0) step = "start";
     if (!skim && step !== "start" && !state.data.email) step = "start";
     state.step = step; save();
@@ -684,7 +800,8 @@ var CONFIG = {
     playerFor(step);
     $("[data-who]").textContent = state.data.business || "";
     $("[data-sign-biz]").textContent = state.data.business || "my business";
-    if (step === "done" && LEADS_API && !skim) { registerAccount(); location.href = dashboardUrl(); return; }
+    if (step === "done" && LEADS_API && !skim && !boot) { registerAccount(); location.href = dashboardUrl(); return; }
+    if (step === "done") $("[data-done-dash]").href = dashboardUrl().replace("&send=1", "");
     if (step === "done") {
       var has = !!state.data.sheet;
       $("[data-sheet-wrap]").hidden = !has; $("[data-sheet-later]").hidden = has;
@@ -696,6 +813,7 @@ var CONFIG = {
       if (!ln.value && state.data.business) { ln.value = state.data.business; state.agreement.legal_name = ln.value; save(); }
       fillDoc();
     }
+    if (step === "area") showQ(state.qi || 0);
     if (step === "leads") {
       // Seed empty first rows with the details from the Start step.
       var e0 = $('[data-multi="lead_emails"] input'), p0 = $('[data-multi="lead_phones"] input');
@@ -975,7 +1093,170 @@ var CONFIG = {
   });
   bmInput.addEventListener("focus", function () { bmInput.select(); });
 
-  // Multi-value fields (Step 4)
+  // ---------- Step 4: about your business. One question at a time; the last is the ad-area map ----------
+  // Map: Leaflet + OpenStreetMap tiles. Address search: Nominatim. Answers save to the Clients sheet ("profile").
+  var fa = $('[data-form="area"]'), tmap = $("[data-tmap]"), rIn = fa.elements.radius, findBtn = $("[data-find]");
+  var QS = $$("[data-q]", fa).map(function (q) { return q.getAttribute("data-q"); });
+  state.target = state.target || {}; state.profile = state.profile || {};
+  var MI = 1609.34, amap = null, apin = null, acircle = null, leafletWait = null, qi = 0;
+  var qerr = $("[data-err]", fa);
+  function qError(t) { qerr.textContent = t || ""; qerr.hidden = !t; }
+  function radiusOut() { $("[data-radius-out]").textContent = rIn.value + " miles"; }
+
+  // restore answers
+  ["price_ev", "price_panel", "price_gen", "constraint_note"].forEach(function (k) {
+    var el = fa.elements[k]; el.value = state.profile[k] || "";
+    el.addEventListener("input", function () {
+      if (/^price_/.test(k)) el.value = el.value.replace(/[^\d,]/g, "");
+      state.profile[k] = el.value.trim(); save();
+    });
+  });
+  $$("[data-choices]", fa).forEach(function (box) {
+    var k = box.getAttribute("data-choices");
+    $$("button", box).forEach(function (b, i) {
+      b.insertAdjacentHTML("afterbegin", '<span class="key">' + "ABCDEFG"[i] + "</span>");
+      b.setAttribute("aria-pressed", String(state.profile[k] === b.textContent.slice(1)));
+      b.addEventListener("click", function () { pick(box, b); });
+    });
+  });
+  function pick(box, b) {
+    var k = box.getAttribute("data-choices");
+    $$("button", box).forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    state.profile[k] = b.textContent.slice(1); save(); qError("");
+    if (k === "constraint" && state.profile[k] === "Something else") { fa.elements.constraint_note.focus(); return; }
+    setTimeout(function () { nextQ(); }, 280);   // Typeform-style: a choice moves on by itself
+  }
+
+  function showQ(i) {
+    qi = Math.max(0, Math.min(QS.length - 1, i)); qError("");
+    $$("[data-q]", fa).forEach(function (q, j) { q.hidden = j !== qi; if (j === qi) { q.classList.remove("q-in"); void q.offsetWidth; q.classList.add("q-in"); } });
+    $("[data-q-count]").textContent = "Question " + (qi + 1) + " of " + QS.length;
+    $("[data-q-bar]").style.width = (qi / QS.length * 100) + "%";
+    $("[data-q-back]").style.visibility = qi ? "visible" : "hidden";
+    var last = qi === QS.length - 1;
+    $("[data-q-next]").textContent = last ? "Save and continue to Step 5" : "OK ✓";
+    state.qi = qi; save();
+    if (fa.getBoundingClientRect().top < 0) fa.scrollIntoView({ behavior: "smooth", block: "start" });   // keep the question in view below the video
+    if (QS[qi] === "area") openArea();
+    else { var first = $("[data-q]:not([hidden]) input", fa); if (first && QS[qi] === "price" && window.innerWidth > 640) first.focus(); }
+  }
+  function answered(k) {
+    var p = state.profile;
+    if (k === "price") return !!(p.price_ev || p.price_panel || p.price_gen) || "Add a price for at least one of the services you do.";
+    if (k === "constraint" && p.constraint === "Something else" && !p.constraint_note) return "Tell us in a few words what's holding you back.";
+    if (k === "area") return !!(state.target.lat && state.target.lng) || "Drop a pin on the map: click where you want your ads centered, or search your address.";
+    return !!p[k] || "Pick one to continue.";
+  }
+  function nextQ() {
+    var ok = answered(QS[qi]);
+    if (ok !== true) { qError(ok); return; }
+    if (qi < QS.length - 1) showQ(qi + 1); else finishQuiz();
+  }
+  fa.addEventListener("submit", function (e) { e.preventDefault(); nextQ(); });
+  $("[data-q-back]").addEventListener("click", function () { showQ(qi - 1); });
+  document.addEventListener("keydown", function (e) {
+    if (state.step !== "area" || e.metaKey || e.ctrlKey || e.altKey) return;
+    var tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "textarea" || tag === "input" || tag === "select") return;
+    var box = $("[data-q]:not([hidden]) [data-choices]", fa);
+    var i = "abcdefg".indexOf(String(e.key).toLowerCase());
+    if (box && i > -1 && $$("button", box)[i]) { e.preventDefault(); pick(box, $$("button", box)[i]); }
+    else if (e.key === "Enter" && tag !== "button") { e.preventDefault(); nextQ(); }
+  });
+
+  // --- the map (question 6) ---
+  function openArea() {
+    var T = state.target, a = state.agreement || {};
+    if (!T.radius) {   // their agreement's service area often says "25 miles"
+      var m = /(\d{2,3})\s*-?\s*(?:mi\b|miles?)/i.exec(a.service_area || "");
+      T.radius = m ? Math.max(15, Math.min(60, Number(m[1]))) : 25;
+    }
+    rIn.value = T.radius; radiusOut();
+    fa.elements.center.value = T.center || ""; fa.elements.include.value = T.include || ""; fa.elements.exclude.value = T.exclude || "";
+    save();
+    drawArea().then(function () {
+      // First visit: start from the business address they typed in the agreement.
+      if (!T.lat && a.address && !T.triedAgreement) { T.triedAgreement = true; save(); fa.elements.center.value = a.address; findCenter(true); }
+    });
+  }
+  function leaflet() {
+    if (window.L) return Promise.resolve(window.L);
+    if (!leafletWait) leafletWait = new Promise(function (ok, no) {
+      var sc = document.createElement("script"); sc.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";
+      sc.onload = function () { ok(window.L); }; sc.onerror = function () { leafletWait = null; no(); };
+      document.head.appendChild(sc);
+    });
+    return leafletWait;
+  }
+  function fitArea() { if (amap && acircle) amap.fitBounds(acircle.getBounds(), { padding: [12, 12] }); }
+  function placePin(lat, lng, fit) {
+    var T = state.target, L = window.L;
+    T.lat = Math.round(lat * 1e5) / 1e5; T.lng = Math.round(lng * 1e5) / 1e5; save(); qError("");
+    if (!apin) {
+      apin = L.marker([T.lat, T.lng], { draggable: true }).addTo(amap);
+      acircle = L.circle([T.lat, T.lng], { radius: Number(rIn.value) * MI, color: "#1f5eff", weight: 2, fillColor: "#1f5eff", fillOpacity: 0.12, interactive: false }).addTo(amap);
+      apin.on("drag", function () { acircle.setLatLng(apin.getLatLng()); });
+      apin.on("dragend", function () { var p = apin.getLatLng(); placePin(p.lat, p.lng, true); });
+    } else { apin.setLatLng([T.lat, T.lng]); acircle.setLatLng([T.lat, T.lng]); }
+    if (fit) fitArea();
+  }
+  function drawArea() {
+    var T = state.target;
+    return leaflet().then(function (L) {
+      if (!amap) {
+        tmap.innerHTML = "";
+        amap = L.map(tmap, { scrollWheelZoom: false }).setView([39.5, -98.35], 4);
+        L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, attribution: "&copy; OpenStreetMap" }).addTo(amap);
+        amap.on("click", function (e) { placePin(e.latlng.lat, e.latlng.lng, false); });
+        if (T.lat && T.lng) placePin(T.lat, T.lng, true);
+      }
+      setTimeout(function () { amap.invalidateSize(); if (T.lat) fitArea(); }, 60);
+    }, function () { tmap.innerHTML = '<div class="tmap-ph">The map couldn\'t load. Type your address in the box above and continue: we\'ll set it up with you.</div>'; });
+  }
+  function lookup(q) {
+    return fetch("https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=us,ca&q=" + encodeURIComponent(q), { headers: { "Accept-Language": "en" } })
+      .then(function (r) { return r.json(); })
+      .then(function (list) { return list && list[0] ? { lat: Number(list[0].lat), lng: Number(list[0].lon) } : null; });
+  }
+  function findCenter(quiet) {
+    var q = fa.elements.center.value.trim();
+    if (!q) { fa.elements.center.focus(); return Promise.resolve(false); }
+    findBtn.disabled = true; findBtn.textContent = "…";
+    return lookup(q).then(function (hit) {
+      findBtn.disabled = false; findBtn.textContent = "Find";
+      if (!hit) { if (!quiet) qError("We couldn't find that. Add the city and state, or just click the map where you want the pin."); return false; }
+      state.target.center = q; save();
+      if (amap) placePin(hit.lat, hit.lng, true); else { state.target.lat = hit.lat; state.target.lng = hit.lng; save(); }
+      return true;
+    }, function () { findBtn.disabled = false; findBtn.textContent = "Find"; return false; });
+  }
+  findBtn.addEventListener("click", function () { findCenter(false); });
+  fa.elements.center.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); findCenter(false); } });
+  fa.elements.center.addEventListener("input", function () { state.target.center = fa.elements.center.value.trim(); save(); });
+  rIn.addEventListener("input", function () { state.target.radius = Number(rIn.value); radiusOut(); save(); if (acircle) { acircle.setRadius(Number(rIn.value) * MI); fitArea(); } });
+  ["include", "exclude"].forEach(function (k) { fa.elements[k].addEventListener("input", function () { state.target[k] = fa.elements[k].value.trim(); save(); }); });
+
+  function saveProfile(retried) {
+    if (!LEADS_API) return;
+    var T = state.target, P = state.profile, a = state.agreement || {};
+    fetch(LEADS_API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, keepalive: true,
+      body: JSON.stringify({ action: "profile", email: state.data.email, center: T.center || "", lat: T.lat || "", lng: T.lng || "",
+        radius: T.radius || "", include: T.include || "", exclude: T.exclude || "", service_area: a.service_area || "", address: a.address || "",
+        price_ev: P.price_ev || "", price_panel: P.price_panel || "", price_gen: P.price_gen || "", callback: P.callback || "",
+        sales: P.sales || "", capacity: P.capacity || "", constraint: [P.constraint, P.constraint_note].filter(Boolean).join(": ") }) })
+      .then(function (r) { return r.json(); })
+      .then(function (r) { if (r && r.error === "no_account" && !retried) { registerAccount(); setTimeout(function () { saveProfile(true); }, 5000); } })
+      .catch(function () {});
+  }
+  function finishQuiz() {
+    var T = state.target;
+    T.radius = Number(rIn.value); T.include = fa.elements.include.value.trim(); T.exclude = fa.elements.exclude.value.trim();
+    if (!T.center) T.center = (state.agreement || {}).address || "";
+    $("[data-q-bar]").style.width = "100%";
+    save(); saveProfile(false); advance();
+  }
+
+  // Multi-value fields (Step 5)
   function addRow(box, val) {
     var type = box.getAttribute("data-type"), row = document.createElement("div");
     row.className = "row-x";
@@ -1042,7 +1323,8 @@ var CONFIG = {
   function toast(t) { var el = document.createElement("div"); el.className = "toast"; el.textContent = t; document.body.appendChild(el); setTimeout(function () { el.remove(); }, 1800); }
   $("[data-yr]").textContent = new Date().getFullYear();
 
-  show(state.step || "start");
+  $("[data-review]").addEventListener("click", function () { show("welcome", true); });
+  show(state.step || "start", false, true);
 })();
 </script>
 </body>

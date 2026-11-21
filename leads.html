@@ -72,6 +72,10 @@
   .welcome .x { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; border: 0; background: none; border-radius: 8px; color: var(--soft); cursor: pointer; font-size: 22px; line-height: 1; }
   .welcome .x:hover { background: #eef2fb; color: var(--ink); }
 
+  .teamview { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: #fff4d6; color: #5a4300; border: 1px solid #f1d58a; border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; font-size: 14px; }
+  .teamview b { color: #3d2e00; }
+  .teamview .tv-tag { font: 800 11px/1 Archivo, Inter, sans-serif; letter-spacing: .12em; text-transform: uppercase; background: #5a4300; color: #fff4d6; border-radius: 6px; padding: 5px 7px; }
+  td.out select:disabled { opacity: .85; cursor: not-allowed; }
   .titlebar { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
   .titlebar h1 { color: #fff; font-size: clamp(28px, 5vw, 40px); font-weight: 900; }
   .titlebar .biz { color: #b9c4dc; margin-top: 6px; font-size: 15px; }
@@ -206,6 +210,7 @@
       <div class="row-between"><button type="button" class="link" data-change-email>Use a different email</button><button type="button" class="link" data-resend>Send a new code</button></div>
       <p class="help">No code? Make sure it's the same email you gave us in onboarding, or text (650) 719-7145.</p>
     </form>
+    <p class="help" data-back-onb hidden style="margin-top:16px;text-align:center"><a href="onboarding.html" style="font-weight:600">← Back to onboarding</a></p>
   </section>
 
   <!-- Dashboard -->
@@ -217,6 +222,12 @@
         <p>We're building your campaign now. On your strategy session we'll show you the ads and get your approval to go live. This is your leads dashboard: every lead shows up here the moment it comes in. Bookmark this page.</p>
       </div>
       <button type="button" class="x" data-dismiss aria-label="Close">×</button>
+    </div>
+
+    <div class="teamview" data-teamview hidden>
+      <span class="tv-tag">Team view</span>
+      <span>You're seeing <b data-tv-biz></b>'s dashboard exactly as they do. Read-only: outcomes can only be changed by the client.</span>
+      <a href="ops.html" data-tv-back style="margin-left:auto;font-weight:700;color:#5a4300">← Back to Daily check</a>
     </div>
 
     <div class="titlebar">
@@ -279,7 +290,21 @@
   function setItem(k, v) { try { localStorage.setItem(k, v); } catch (e) { mem[k] = v; } }
   function delItem(k) { try { localStorage.removeItem(k); } catch (e) {} delete mem[k]; }
   var AUTH_KEY = "ta_leads_auth";
-  function auth() { try { return JSON.parse(getItem(AUTH_KEY) || "null"); } catch (e) { return null; } }
+  // Team view ("Log in as client" on /ops): a read-only token in the URL hash, kept for this tab only, so it never
+  // replaces anyone's own sign-in. The hash is removed from the address bar straight away (it's screenshared).
+  var VIEW_KEY = "ta_leads_view", viewTok = null;
+  (function () {
+    var m = /(?:^#|&)view=([^&]+)/.exec(location.hash);
+    if (m) {
+      viewTok = decodeURIComponent(m[1]);
+      try { sessionStorage.setItem(VIEW_KEY, viewTok); } catch (e) {}
+      try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+    } else { try { viewTok = sessionStorage.getItem(VIEW_KEY); } catch (e) {} }
+  })();
+  function auth() {
+    if (viewTok) return { token: viewTok, view: true };
+    try { return JSON.parse(getItem(AUTH_KEY) || "null"); } catch (e) { return null; }
+  }
 
   function api(action, data) {
     var body = JSON.stringify(Object.assign({ action: action }, data || {}));
@@ -347,6 +372,9 @@
 
   function showSignin() {
     stopPoll();
+    // Came from onboarding (or started it on this device): offer the way back.
+    var onb = false; try { onb = !!localStorage.getItem("tradieads-onboarding-v1"); } catch (e) {}
+    $("[data-back-onb]").hidden = !(onb || q.get("welcome"));
     view("signin");
     $("[data-signout]").hidden = true; $("[data-who]").textContent = "";
     var email = (q.get("email") || getItem("ta_leads_email") || "").trim().toLowerCase();
@@ -361,7 +389,18 @@
     } else if (!email) fe.elements.email.focus();
   }
 
-  $("[data-signout]").addEventListener("click", function () { delItem(AUTH_KEY); rows = []; outcomes = {}; info = null; known = null; openIds = {}; freshThisVisit = {}; $("[data-roi]").hidden = true; showSignin(); });
+  function endTeamView(text) {   // the 4-hour team-view token ran out
+    stopPoll(); try { sessionStorage.removeItem(VIEW_KEY); } catch (e) {}
+    viewTok = null; view("offline");
+    $("[data-view=offline] h1").textContent = text;
+    $("[data-view=offline] p").textContent = "Open it again from the Daily check: tradie-ads.com/ops → the client → Log in as client.";
+    $("[data-signout]").hidden = true; $("[data-who]").textContent = "";
+  }
+  function leaveTeamView() { try { sessionStorage.removeItem(VIEW_KEY); } catch (e) {} location.href = "ops.html"; }
+  $("[data-tv-back]").addEventListener("click", function (e) { e.preventDefault(); leaveTeamView(); });
+  $("[data-signout]").addEventListener("click", function () {
+    if (viewTok) { leaveTeamView(); return; }
+    delItem(AUTH_KEY); rows = []; outcomes = {}; info = null; known = null; openIds = {}; freshThisVisit = {}; $("[data-roi]").hidden = true; showSignin(); });
 
   // ---------- leads ----------
   var META = { id: 1, ad_id: 1, ad_name: 1, adset_id: 1, adset_name: 1, campaign_id: 1, campaign_name: 1, form_id: 1, form_name: 1,
@@ -520,6 +559,7 @@
     inp.addEventListener("input", function () { inp.value = inp.value.replace(/[^\d,]/g, ""); });
     inp.addEventListener("change", save);
     inp.addEventListener("keydown", function (e) { if (e.key === "Enter") inp.blur(); });
+    if (viewTok) { sel.disabled = true; inp.disabled = true; sel.title = "Team view is read-only"; }
     td.appendChild(sel); td.appendChild(wrap); td.appendChild(note);
     td.addEventListener("focusout", function () { setTimeout(function () { if (renderLater && !editing()) { renderLater = false; render(); } }, 0); });
     return td;
@@ -590,15 +630,22 @@
     var a = auth();
     if (!a) { showSignin(); return Promise.resolve(); }
     return api("leads", { token: a.token }).then(function (r) {
-      if (!r.ok) { if (r.error === "signed_out") { delItem(AUTH_KEY); showSignin(); } else setLive(false); return; }
+      if (!r.ok) {
+        if (r.error === "signed_out") { if (viewTok) { endTeamView("Team view expired"); return; } delItem(AUTH_KEY); showSignin(); }
+        else setLive(false);
+        return;
+      }
       info = r;
       view("dash");
       $("[data-signout]").hidden = false;
+      $("[data-signout]").textContent = viewTok ? "Exit team view" : "Sign out";
+      $("[data-teamview]").hidden = !viewTok;
+      $("[data-tv-biz]").textContent = r.business || r.email;
       $("[data-who]").textContent = r.business || r.email;
       $("[data-biz]").textContent = r.business ? r.business + " · " + r.email : r.email;
       var first = (r.name || "").split(/\s+/)[0];
       $("[data-first]").textContent = first ? ", " + first : "";
-      $("[data-welcome]").hidden = getItem("ta_leads_welcome") !== "1";
+      $("[data-welcome]").hidden = !!viewTok || getItem("ta_leads_welcome") !== "1";
       setLive(true);
 
       var headers = r.headers || [], data = r.rows || [];
