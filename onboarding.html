@@ -579,8 +579,8 @@
      Then bump CONFIG.agreementVersion (e.g. "2026-11-v1") so every signature records which version was signed. -->
 <template id="agreement-text">
 <img class="doc-logo" src="assets/logo-dark.png" alt="Tradie Ads">
-<h2>Client Services Agreement &amp; Positive-ROI Guarantee</h2>
-<p>This Client Services Agreement (the "Agreement") is entered into on the Effective Date below between the Provider and the Client named here. The Provider will run paid advertising for the Client's electrical services business and guarantees a positive return: if the jobs the Client sells to the Provider's leads don't add up to more than the Client's Total Spend, the Client gets the Service Fee back.</p>
+<h2>Client Services Agreement &amp; Lead Guarantee</h2>
+<p>This Client Services Agreement (the "Agreement") is entered into on the Effective Date below between the Provider and the Client named here. The Provider will run paid advertising for the Client's electrical services business and guarantees a minimum number of leads: if the Provider delivers fewer than <span data-f="leads"></span> Qualifying Leads during the Term, the Client gets the Service Fee back. Following up and closing those leads is the Client's side of the deal.</p>
 
 <h3>1. Parties</h3>
 <p>This Agreement is made on <span data-f="date"></span> (the <b>"Effective Date"</b>) between:</p>
@@ -618,13 +618,13 @@
 <li>Declined ad payments or a paused ad account pause the Term until ads are running again.</li>
 </ul>
 
-<h3>4. The Positive-ROI Guarantee</h3>
-<p>The Provider guarantees that the <b>Sold Job Value</b> from the Client's Leads will be <b>more than the Client's Total Spend of $<span data-f="total"></span> USD</b>. If it is not, and the Client has met every condition in Section 5, the Client is entitled to the refund in Section 7.</p>
+<h3>4. The Lead Guarantee</h3>
+<p>The Provider guarantees that the Client will receive <b>at least <span data-f="leads"></span> Qualifying Leads during the Term</b>. If it does not, and the Client has met every condition in Section 5, the Client is entitled to the refund in Section 7.</p>
 <p><b>Definitions</b></p>
 <ul>
 <li><b>Lead</b> means a person who submits the Provider's form or landing page for the Client during the Term.</li>
-<li><b>Sold Job</b> means work a Lead agrees to buy from the Client, by signing a quote or contract or paying a deposit, during the Term or within <b>14 days after the Term ends</b> (together, the <b>"Measurement Window"</b>). Any electrical service counts, not only the one advertised.</li>
-<li><b>Sold Job Value</b> means the total price of all Sold Jobs before tax, at the Client's usual prices.</li>
+<li><b>Qualifying Lead</b> means a Lead with a real name and a working phone number or email address. A Lead is not a Qualifying Lead if it is (a) a duplicate of a Lead already delivered during the Term (the same person submitting more than once), or (b) plainly fake or spam, such as a made-up name together with a phone number and email that do not work, or a test or joke submission.</li>
+<li><b>Bad Lead reporting.</b> The Client must mark a Lead as "Bad lead" in the leads dashboard, with the reason, within <b>7 days</b> of its delivery for it to be excluded. Any Lead not marked within 7 days counts as a Qualifying Lead. The Provider may review a marked Lead and will count it if it meets the definition above.</li>
 </ul>
 <p><b>What each Lead includes</b></p>
 <p>The Provider's form collects the following from each Lead:</p>
@@ -654,20 +654,16 @@
 <li>Gives the Provider access to its ad account, business page and any other assets reasonably requested within 3 business days of signing</li>
 <li>Approves or comments on ad creative within 2 business days of receiving it</li>
 <li>Does not edit, pause or change the campaigns, targeting or forms without the Provider's written agreement</li>
-<li>Contacts every Lead promptly: a first call or text within 1 business day of delivery, and at least 3 attempts within 5 business days if the Lead doesn't answer</li>
-<li>Quotes Leads at its usual prices and terms</li>
-<li>Records the outcome of every Lead in the leads dashboard (Contacted, Quoted, Sold with its job value, Not interested or Bad lead) within 7 days of that outcome, and no later than the end of the Measurement Window</li>
-<li>On request, shows the Provider the quote, contract, invoice or deposit for any Lead marked Quoted or Sold</li>
 <li>Keeps a service area of at least <span data-f="radius"></span> miles radius (or the ZIP codes listed in Section 1)</li>
 <li>Holds a valid licence and any permits required to perform the advertised services</li>
 </ul>
 <p>If the Client breaks a condition, the Guarantee is void. If the ad platform rejects ads or restricts the Client's account for reasons tied to the Client's business, the Term is paused until ads are running again.</p>
 
 <h3>6. What Is Not Guaranteed</h3>
-<p>The Guarantee covers Sold Job Value only. The Provider does not guarantee a number of Leads, that any Lead will answer, book or buy, the Client's profit after its own costs, cash collected, or any result after the Measurement Window.</p>
+<p>The Guarantee covers the number of Qualifying Leads only. The Provider does not guarantee that any Lead will answer, book or buy, the number or value of jobs the Client sells, the Client's revenue, profit or return on its spend, the cost per Lead, or any result after the Term. Contacting, quoting and closing Leads is the Client's responsibility.</p>
 
 <h3>7. Refund Remedy</h3>
-<p>If the Sold Job Value at the end of the Measurement Window is not more than the Total Spend, and the Client has met every condition in Section 5, the Provider will refund the full Service Fee of <b>$<span data-f="fee"></span> USD</b>. The Client must request it by email within <b>14 days</b> after the Measurement Window ends. The Provider will pay it within <b>14 business days</b> of the request, to the original payment method.</p>
+<p>If the Client receives fewer than <span data-f="leads"></span> Qualifying Leads by the end of the Term, and has met every condition in Section 5, the Provider will refund the full Service Fee of <b>$<span data-f="fee"></span> USD</b>. The Client must request it by email within <b>14 days</b> after the Term ends. The Provider will pay it within <b>14 business days</b> of the request, to the original payment method.</p>
 <p>The refund covers the Service Fee only. Ad Spend paid to the platform is not refundable. This refund is the Client's sole and exclusive remedy for a missed Guarantee.</p>
 
 <h3>8. Term and Cancellation</h3>
@@ -709,7 +705,7 @@
 </ul>
 
 <h3>15. Signatures</h3>
-<p>By signing, each Party confirms it has read, understood and agrees to this Agreement, including the conditions of the Positive-ROI Guarantee.</p>
+<p>By signing, each Party confirms it has read, understood and agrees to this Agreement, including the conditions of the Lead Guarantee.</p>
 <div class="sigs">
 <p><b>Provider — 13541398 Canada Inc., operating as Tradie Ads</b></p>
 <p>Signature: <span class="script">Ethan Eigenfeldt</span></p>
@@ -752,12 +748,12 @@ var CONFIG = {
   // alerts + the client's signed-agreement email. Blank = off.
   notifyUrl: "https://script.google.com/macros/s/AKfycbzRSxcqHN3k-FcGZZrLrtNpZbsoGE0eSFj7elp1RVN6L_TD_QxGkXZ52Bdi-K0S8-f83Q/exec",
   // Version label saved with each signature. Bump it whenever the agreement text in <template id="agreement-text"> changes.
-  agreementVersion: "2026-11-20",
+  agreementVersion: "2026-11-26",
   // Packages, picked by the ?plan= code in the client's onboarding link (e.g. ?plan=30). The agreement shows the
   // client's package filled in and locked; without a valid plan in the link they can't sign. Amounts in USD.
   packages: {
-    "30": { label: "30-day package", fee: 1000, spend: 1000, days: 30 },
-    "14": { label: "2-week starter", fee: 500, spend: 500, days: 14 }
+    "30": { label: "30-day package", fee: 1000, spend: 1000, days: 30, leads: 30 },
+    "14": { label: "2-week starter", fee: 500, spend: 500, days: 14, leads: 15 }
   },
   // Section 5 minimum service-area radius (miles). Blank = the line shows "______".
   minRadiusMiles: "15",
@@ -805,7 +801,7 @@ var CONFIG = {
     var code = state.signature && state.signature.plan ? state.signature.plan : state.data.plan;
     var p = CONFIG.packages[code];
     if (!p) return null;
-    return { code: code, label: p.label, fee: p.fee, spend: p.spend, days: p.days, total: p.fee + p.spend, daily: Math.round(p.spend / p.days) };
+    return { code: code, label: p.label, fee: p.fee, spend: p.spend, days: p.days, leads: p.leads, total: p.fee + p.spend, daily: Math.round(p.spend / p.days) };
   }
   function money(n) { return Number(n).toLocaleString("en-US"); }
 
@@ -1058,7 +1054,7 @@ var CONFIG = {
       rep: [sigName || d.name, a.title].filter(Boolean).join(", "),
       email: d.email, phone: d.phone, service_area: a.service_area, title: a.title,
       radius: CONFIG.minRadiusMiles,
-      fee: pk ? money(pk.fee) : "", spend: pk ? money(pk.spend) : "", days: pk ? pk.days : "",
+      fee: pk ? money(pk.fee) : "", spend: pk ? money(pk.spend) : "", days: pk ? pk.days : "", leads: pk ? pk.leads : "",
       total: pk ? money(pk.total) : "", daily: pk ? money(pk.daily) : "",
       sig: g ? g.name : "", sig_name: g ? g.name : "",
       sig_date: g ? new Date(g.at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""
